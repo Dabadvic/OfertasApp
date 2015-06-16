@@ -28,6 +28,14 @@ angular.module('ofertasApp', ['ionic', 'controladoresApp'])
     controller: 'controladorOfertas'
   })
 
+// Vista con las preferencias de usuario
+  $stateProvider.state('preferencias', {
+    url: '/settings',
+    templateUrl: 'templates/preferencias.html',
+    controller: 'controladorPreferencias'
+  })
+
+
 // Vista que lleva al detalle de una oferta concreta
   $stateProvider.state('detalle', {
     url: '/:ofertaId',

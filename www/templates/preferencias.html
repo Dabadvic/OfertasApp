@@ -1,0 +1,27 @@
+<ion-view view-title="Preferencias" ng-controller="controladorPreferencias">
+
+  <ion-nav-title>
+    Preferencias
+  </ion-nav-title>
+
+  <ion-pane>    
+    <ion-content>
+
+      <div class="item item-divider"> 
+        Notificaciones
+      </div>
+      
+      <ion-checkbox ng-model="recibirNotificaciones.checked" ng-change="notificaciones()">Recibir notificaciones</ion-checkbox>
+
+      <label class="item item-input">
+        <span class="input-label">Distancia de recepción</span>
+        <input type="number"> metros
+      </label>
+
+      <div class="item item-divider"> 
+        Aplicación
+      </div>
+
+    </ion-content>
+  </ion-pane>
+</ion-view>
