@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <widget id="com.ionicframework.ofertas603842" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>ofertas</name>
+  <name>Ofertas</name>
   <description>
-        An Ionic Framework and Cordova project.
+        Proyecto para Talentum, consistente en una aplicación para la recepción y envío de ofertas locales.
     </description>
-  <author email="hi@ionicframework" href="http://ionicframework.com/">
-      Ionic Framework Team
+  <author email="davidabad10@gmail.com">
+      David Abad Vich
     </author>
   <content src="index.html"/>
   <access origin="*"/>

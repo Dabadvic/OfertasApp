@@ -1,1 +1,21 @@
 /* Empty. Add your own CSS if you like */
+#nombreOferta {
+	position: absolute;
+}
+
+#distanciaOferta {
+	text-align: right; 
+	position: relative;
+	font-weight: normal;
+}
+
+#descripcionOferta {
+	position: absolute;
+	font-weight: normal;
+}
+
+#finOferta {
+	text-align: right;
+	position: relative;
+	font-weight: normal;
+}

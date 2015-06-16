@@ -1,10 +1,7 @@
-// Ionic Starter App
+// Se indica el nombre del módulo y un array de los componentes que requiere
+angular.module('ofertasApp', ['ionic', 'controladoresApp'])
 
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-angular.module('ofertasApp', ['ionic'])
-
+// Este lo trae así por defecto
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -18,6 +15,35 @@ angular.module('ofertasApp', ['ionic'])
   });
 })
 
-.controller('controladorOfertas', function($scope) {
-  $scope.items = ["item1", "item2", "item3"];
-});
+// Para la navegación entre vistas
+.config(function($stateProvider, $urlRouterProvider) {
+  $urlRouterProvider.otherwise('/')
+  
+  console.log("Carga vista");
+
+// Vista principal, que es la que se carga si no hay nada (especificado en el otherwise)
+  $stateProvider.state('ofertas', {
+    url: '/',
+    templateUrl: 'templates/main.html',
+    controller: 'controladorOfertas'
+  })
+
+  $stateProvider.state('detalle', {
+    url: '/oferta',
+    templateUrl: 'templates/oferta.html',
+  })
+
+// Vista que lleva al detalle de una oferta concreta
+/*
+  $stateProvider.state('detalle', {
+  url: '/:oferta',
+  templateUrl: 'templates/oferta.html',
+  controller: 'controladorDetalles',
+  resolve: {
+    oferta: function($stateParams, servicioOfertas) {
+      return servicioOfertas.getOferta($stateParams.oferta)
+    }
+  }
+  })
+*/
+})
