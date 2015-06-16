@@ -1,22 +1,14 @@
-<1ion-view view-title="Listado">
-  <ion-pane>
-    <ion-header-bar class="bar-stable">
-      <h1 class="title">Ofertas locales</h1>
-    </ion-header-bar>
-    
+<ion-view view-title="Listado">
+  <ion-pane>    
     <ion-content>
       <ion-list>
-        <ion-item ng-repeat="oferta in ofertas">
+        <ion-item ng-repeat="oferta in ofertas" ui-sref="detalle({ofertaId: $index})">
         <div>
           <p> <h2 id="nombreOferta">{{oferta.nombre}}</h2> <h3 id="distanciaOferta">{{oferta.distancia}} m</h3> <br>
            <h3 id="descripcionOferta">{{oferta.descripcion}}</h3>  <h3 id="finOferta">{{oferta.fin}}</h3></p>
         </div>
         </ion-item>
       </ion-list>
-
-      <ion-item ui-sref="detalle">
-        Prueba
-      </ion-item>
 
     </ion-content>
   </ion-pane>

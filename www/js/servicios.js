@@ -1,5 +1,4 @@
-/*
-angular.module('serviciosApp', ['ngResource'])
+angular.module('serviciosApp', [])
 
 .factory('servicioOfertas', function() {
   var ofertas = [
@@ -15,4 +14,3 @@ angular.module('serviciosApp', ['ngResource'])
     }
   }
 })
-*/

@@ -28,22 +28,15 @@ angular.module('ofertasApp', ['ionic', 'controladoresApp'])
     controller: 'controladorOfertas'
   })
 
-  $stateProvider.state('detalle', {
-    url: '/oferta',
-    templateUrl: 'templates/oferta.html',
-  })
-
 // Vista que lleva al detalle de una oferta concreta
-/*
   $stateProvider.state('detalle', {
-  url: '/:oferta',
-  templateUrl: 'templates/oferta.html',
-  controller: 'controladorDetalles',
-  resolve: {
-    oferta: function($stateParams, servicioOfertas) {
-      return servicioOfertas.getOferta($stateParams.oferta)
+    url: '/:ofertaId',
+    templateUrl: 'templates/oferta.html',
+    controller: 'controladorDetalles',
+    resolve: {
+      oferta: function($stateParams, servicioOfertas) {
+        return servicioOfertas.getOferta($stateParams.ofertaId)
+      }
     }
-  }
   })
-*/
-})
+});
