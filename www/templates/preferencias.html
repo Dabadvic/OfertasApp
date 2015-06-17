@@ -14,13 +14,27 @@
       <ion-checkbox ng-model="recibirNotificaciones.checked" ng-change="notificaciones()">Recibir notificaciones</ion-checkbox>
 
       <label class="item item-input">
-        <span class="input-label">Distancia de recepción</span>
-        <input type="number"> metros
+        <span class="input-label">Distancia (metros)</span>
+        <input type="number" value="500"> 
       </label>
 
       <div class="item item-divider"> 
         Aplicación
       </div>
+
+      <label class="item item-input">
+        <span class="input-label">Idioma</span>
+        <select>
+          <option value="es-ES">Español</option>
+          <option value="en-EN">English</option>
+          <option value="it-IT">Italiano</option>
+          <option value="fr-FR">Français</option>
+        </select>
+      </label>
+
+      <ion-item menu-close ng-click="login()">
+        ¿Eres dueño de un negocio? Identifícate
+      </ion-item>
 
     </ion-content>
   </ion-pane>
