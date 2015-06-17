@@ -12,6 +12,10 @@ angular.module('ofertasApp', ['ionic', 'controladoresApp'])
     if(window.StatusBar) {
       StatusBar.styleDefault();
     }
+
+    // Preparar Parse con la ID de la aplicación y la clave de JavaScript (ambas en la web)
+    Parse.initialize("4R2V91bSep94FYqbspK1UkLIAL2Kd5IQJFCmZsMB", "aaHJB3mLTT2UmgaUyEvn2PQKBpO60WQDFqWNTodO");
+    
   });
 })
 

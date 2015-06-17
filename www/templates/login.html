@@ -8,22 +8,28 @@
   <ion-content>
       <div class="list">
         <label class="item item-input">
-          <span class="input-label">Usuario</span>
-          <input type="text" ng-model="loginData.username">
+          <input type="text" placeholder="Usuario" ng-model="loginData.username">
         </label>
         <label class="item item-input">
-          <span class="input-label">Contraseña</span>
-          <input type="password" ng-model="loginData.password">
+          <input type="password" placeholder="Contraseña" ng-model="loginData.password">
         </label>
         <label class="item">
-          <button class="button button-block button-positive" ng-click="doLogin()">Identifícame</button>
+          <button class="button button-block button-positive" ng-click="identificar()">Identifícame</button>
         </label>
+
+        <div class="item item-divider"> 
+          Registrar negocio
+        </div>
+        
         <label class="item item-input">
           <span class="input-label">Clave de registro</span>
           <input type="text" ng-model="loginData.key">
         </label>
         <label class="item">
-          <button class="button button-block" ng-click="registrar()">Registrate</button>
+          <button class="button button-block button-balanced" ng-click="registraUsuario()">Registrate</button>
+        </label>
+        <label class="item">
+          <p>Puedes conseguir tu clave mandando un email a:</p><p>contacto@email.com</p>
         </label>
       </div>
   </ion-content>
