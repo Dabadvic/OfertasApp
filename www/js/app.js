@@ -39,6 +39,12 @@ angular.module('ofertasApp', ['ionic', 'controladoresApp'])
     controller: 'controladorPreferencias'
   })
 
+// Vista con las preferencias de usuario
+  $stateProvider.state('registro', {
+    url: '/settings/registro',
+    templateUrl: 'templates/registro.html',
+    controller: 'controladorRegistro'
+  })
 
 // Vista que lleva al detalle de una oferta concreta
   $stateProvider.state('detalle', {

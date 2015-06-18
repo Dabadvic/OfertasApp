@@ -1,0 +1,29 @@
+<ion-view view-title="Registro">
+
+	<ion-nav-title>
+	  Registro
+	</ion-nav-title>
+	<ion-pane> 
+	<ion-content>
+		<div class="list">
+		  <label class="item item-input item-stacked-label">
+		    <span class="input-label">Nombre</span>
+		    <input type="text" placeholder="John" ng-model="loginData.nombre">
+		  </label>
+		  <label class="item item-input item-stacked-label">
+		    <span class="input-label">Apellidos</span>
+		    <input type="text" placeholder="Doe" ng-model="loginData.apellidos">
+		  </label>
+		  <label class="item item-input item-stacked-label">
+		    <span class="input-label">Correo electrónico</span>
+		    <input type="text" placeholder="john@doe.com" ng-model="loginData.email">
+		  </label>
+		  <label class="item item-input item-stacked-label">
+		    <span class="input-label">Nombre del local</span>
+		    <input type="text" placeholder="Bar Pepe" ng-model="loginData.local">
+		  </label>
+		</div>
+		<button class="button button-block button-positive" ng-click="registraUsuario()">Registrame</button>
+	</ion-content>
+	</ion-pane> 
+</ion-view>

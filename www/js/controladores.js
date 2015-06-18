@@ -9,14 +9,14 @@ angular.module('controladoresApp', ['serviciosApp'])
 	}
 })
 
-.controller('controladorBarra', function MyCtrl($scope, $ionicHistory) {
+.controller('controladorBarra', function ($scope, $ionicHistory) {
   	$scope.atras = function() {
   		console.log("Vuelve atrás");
     	$ionicHistory.goBack();
   	};
 })
 
-.controller('controladorPreferencias', function($scope, $ionicModal, $timeout, $ionicLoading) {
+.controller('controladorPreferencias', function($scope, $ionicModal, $timeout, $ionicLoading, $state) {
   $scope.notificaciones = function() {
     console.log('Cambio preferencias recibir notificaciones', $scope.recibirNotificaciones.checked);
   };
@@ -25,26 +25,38 @@ angular.module('controladoresApp', ['serviciosApp'])
 
   //----------------------------Login---------------------------------
   
-  // Form data for the login modal
+  document.getElementById("botonEditar").style.visibility = "hidden";
+
+  // Crea los datos para el login modal
   $scope.loginData = {};
   $scope.loginData.identificado = "¿Eres dueño de un negocio? Identifícate";
-  // Create the login modal that we will use later
+  
+  // Crear la ventana modal que usaremos para el login
   $ionicModal.fromTemplateUrl('templates/login.html', {
     scope: $scope
   }).then(function(modal) {
     $scope.modal = modal;
   });
 
-  // Triggered in the login modal to close it
+  // Función para cerrar el login
   $scope.closeLogin = function() {
     $scope.modal.hide();
   };
 
-  // Open the login modal
+  // Abre el login
   $scope.login = function() {
     $scope.modal.show();
   };
 
+  $scope.registraUsuario = function() {
+  	$state.go('registro');
+  	
+  	// Comprobará que la clave introducida sea correcta
+  	$timeout(function() {
+		$scope.closeLogin();
+	}, 	1000);
+  };
+/*
 	$scope.registraUsuario = function() {
 		usuario = $scope.loginData.username;
 		password = $scope.loginData.password;
@@ -70,6 +82,8 @@ angular.module('controladoresApp', ['serviciosApp'])
 		        	$timeout(function() {
 			      		$scope.closeLogin();
 					}, 	1000);
+
+					$ionicLoading.show({ template: 'Usuario ' + usuario + ' registrado', noBackdrop: true, duration: 2000 });
     			}
    			},
    	    	error: function(error) {
@@ -77,6 +91,7 @@ angular.module('controladoresApp', ['serviciosApp'])
 	    	}
     	});
     };
+*/
 
   	$scope.identificar = function() {
   		console.log('Identificando', $scope.loginData);
@@ -103,24 +118,30 @@ angular.module('controladoresApp', ['serviciosApp'])
 	   	        } else {
 	   	        	$ionicLoading.show({ template: 'Usuario incorrecto', noBackdrop: true, duration: 2000 });
 	   	        }
+				
+				if(correcto) {
+	    			$scope.loginData.identificado = "Bienvenido, " + usuario;
+	    			document.getElementById("botonEditar").style.visibility = "visible";
+	    		} else {
+	    			$scope.loginData.identificado = "¿Eres dueño de un negocio? Identifícate";
+	    			document.getElementById("botonEditar").style.visibility = "hidden";
+	    		}
+
+	    		console.log("Estado: " + correcto);
+      			$scope.closeLogin();
+
    	    	},
    	    	error: function(error) {
    	        	console.log("Error: " + error.code + " " + error.message);
 	       	}
     	});
-
-    	$timeout(function() {
-    		if(correcto) {
-    			$scope.loginData.identificado = "Bienvenido, " + usuario;
-    		} else {
-    			$scope.loginData.identificado = "¿Eres dueño de un negocio? Identifícate";
-    		}
-    		console.log("Estado: " + correcto);
-      		$scope.closeLogin();
-    	}, 	1500);
 	};
   //------------------------------------------------------------------
 
+
+})
+
+.controller('controladorRegistro', function($scope) {
 
 })
 
