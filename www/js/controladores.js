@@ -16,12 +16,16 @@ angular.module('controladoresApp', ['serviciosApp'])
   	};
 })
 
+//----------------------------------------Preferencias---------------------------------------------------------------
+
 .controller('controladorPreferencias', function($scope, $ionicModal, $timeout, $ionicLoading, $state) {
+  
+  // Prepara las preferencias de usuario sobre recibir notificaciones
+  $scope.recibirNotificaciones = {checked: true};
+
   $scope.notificaciones = function() {
     console.log('Cambio preferencias recibir notificaciones', $scope.recibirNotificaciones.checked);
   };
-
-  $scope.recibirNotificaciones = {checked: true};
 
   //----------------------------Login---------------------------------
   
@@ -43,46 +47,105 @@ angular.module('controladoresApp', ['serviciosApp'])
     $scope.modal.hide();
   };
 
-  // Abre el login
+  // Abre el login, reiniciando los campos por si han sido utilizados antes
   $scope.login = function() {
     $scope.modal.show();
+    $scope.loginData.username = '';
+	$scope.loginData.password = '';
+	$scope.loginData.key = '';
   };
 
+  // Función que asigna al botón registrar la función de ir a la vista de registro
   $scope.registraUsuario = function() {
-  	$state.go('registro');
-
   	// Comprobará que la clave introducida sea correcta
-  	$timeout(function() {
-		$scope.closeLogin();
-	}, 	1000);
+  	var KeyObject = Parse.Object.extend("KeyObject");
+  	var query = new Parse.Query(KeyObject);
+
+  	var clave = $scope.loginData.key;
+
+  	query.equalTo("key", clave);
+
+  	query.first({
+   	    	success: function(object) {
+   	    		// Define el mensaje tipo toast que va a mostrar
+   	    		var toast = {};
+   	    		toast.noBackdrop = true;
+   	    		toast.duration = 1500;
+
+   	    		// Si no lo encuentra devuelve undefined, si lo encuentra se comprobaría la contraseña
+   	        	if (object != undefined) {
+	   	        	var usada = object.get("usada");
+	   	        	if (!usada) {
+	   	        		toast.template = 'Clave correcta';
+	   	        		$ionicLoading.show(toast);
+	   	        		$state.go('registro');
+	   	        		$scope.closeLogin();
+	   	        		usada = true;
+
+	   	        		object.set("usada", usada);
+	   	        		object.save(null, {});
+	   	        	} else {
+	   	        		toast.template = 'La clave ya ha sido usada';
+	   	        		$ionicLoading.show(toast);
+	   	        	}
+	   	        } else {
+	   	        	toast.template = 'Clave incorrecta';
+	   	        	$ionicLoading.show(toast);
+	   	        }
+				
+				if(correcto) {
+	    			$scope.loginData.identificado = "Bienvenido, " + usuario;
+	    			document.getElementById("botonEditar").style.visibility = "visible";
+	    		} else {
+	    			$scope.loginData.identificado = "¿Eres dueño de un negocio? Identifícate";
+	    			document.getElementById("botonEditar").style.visibility = "hidden";
+	    		}
+
+	    		console.log("Estado: " + correcto);
+      			$scope.closeLogin();
+
+   	    	},
+   	    	error: function(error) {
+   	        	console.log("Error: " + error.code + " " + error.message);
+	       	}
+    	});
   };
 
 
-	// Identifica al usuario según nombre y contraseña
+	// Función que identifica al usuario según nombre y contraseña
   	$scope.identificar = function() {
   		console.log('Identificando', $scope.loginData);
 
-  		usuario = $scope.loginData.username;
-		password = $scope.loginData.password;
+  		var usuario = $scope.loginData.username;
+		var password = $scope.loginData.password;
 
    		var UserObject = Parse.Object.extend("UserObject");
    		var query = new Parse.Query(UserObject);
    		var correcto = false;
    		query.equalTo("usuario", usuario);
 
+   		// Función de Parse que busca la primera ocurrencia de lo especificado anteriormente
+   		// (como sólo habrá un usuario registrado con un mismo email, esto será suficiente)
    		query.first({
    	    	success: function(object) {
+   	    		// Define el mensaje tipo toast que va a mostrar
+   	    		var toast = {};
+   	    		toast.noBackdrop = true;
+   	    		toast.duration = 1500;
+
+   	    		// Si no lo encuentra devuelve undefined, si lo encuentra se comprobaría la contraseña
    	        	if (object != undefined) {
 	   	        	if (password == object.get("password")) {
-	   	        		console.log("Clave correcta");
-	   	        		correcto = true
-	   	        		$ionicLoading.show({ template: 'Identificado con éxito', noBackdrop: true, duration: 2000 });
+	   	        		correcto = true;
+	   	        		toast.template = 'Identificado con éxito';
+	   	        		$ionicLoading.show(toast);
 	   	        	} else {
-	   	        		console.log("Clave incorrecta");
-	   	        		$ionicLoading.show({ template: 'Clave incorrecta', noBackdrop: true, duration: 2000 });
+	   	        		toast.template = 'Contraseña incorrecta';
+	   	        		$ionicLoading.show(toast);
 	   	        	}
 	   	        } else {
-	   	        	$ionicLoading.show({ template: 'Usuario incorrecto', noBackdrop: true, duration: 2000 });
+	   	        	toast.template = 'Usuario incorrecto';
+	   	        	$ionicLoading.show(toast);
 	   	        }
 				
 				if(correcto) {
@@ -102,10 +165,9 @@ angular.module('controladoresApp', ['serviciosApp'])
 	       	}
     	});
 	};
-  //------------------------------------------------------------------
-
-
 })
+
+//----------------------------------------Registro-------------------------------------------------------------------
 
 .controller('controladorRegistro', function($scope, $ionicLoading, $ionicHistory) {
 
@@ -144,7 +206,7 @@ angular.module('controladoresApp', ['serviciosApp'])
 		        	user.set("email", email);
 		        	user.set("local", local);
 
-		        	//user.save(null, {});
+		        	user.save(null, {});
 
 					$ionicLoading.show({ template: 'Usuario registrado', noBackdrop: true, duration: 2000 });
 
@@ -156,6 +218,7 @@ angular.module('controladoresApp', ['serviciosApp'])
 	    	}
     	});
     };
+})
 
 .controller('controladorDetalles', function($scope, oferta) {
   $scope.oferta = oferta
