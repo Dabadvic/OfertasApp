@@ -57,6 +57,7 @@ angular.module('controladoresApp', ['serviciosApp'])
 	}, 	1000);
   };
 
+
 	// Identifica al usuario según nombre y contraseña
   	$scope.identificar = function() {
   		console.log('Identificando', $scope.loginData);
@@ -155,7 +156,6 @@ angular.module('controladoresApp', ['serviciosApp'])
 	    	}
     	});
     };
-})
 
 .controller('controladorDetalles', function($scope, oferta) {
   $scope.oferta = oferta
