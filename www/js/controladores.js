@@ -80,10 +80,12 @@ angular.module('controladoresApp', ['serviciosApp'])
 	   	        		$ionicLoading.show(toast);
 	   	        		$state.go('registro');
 	   	        		$scope.closeLogin();
+	   	        		/*
 	   	        		usada = true;
 
 	   	        		object.set("usada", usada);
 	   	        		object.save(null, {});
+	   	        		*/
 	   	        	} else {
 	   	        		toast.template = 'La clave ya ha sido usada';
 	   	        		$ionicLoading.show(toast);
@@ -92,18 +94,6 @@ angular.module('controladoresApp', ['serviciosApp'])
 	   	        	toast.template = 'Clave incorrecta';
 	   	        	$ionicLoading.show(toast);
 	   	        }
-				
-				if(correcto) {
-	    			$scope.loginData.identificado = "Bienvenido, " + usuario;
-	    			document.getElementById("botonEditar").style.visibility = "visible";
-	    		} else {
-	    			$scope.loginData.identificado = "¿Eres dueño de un negocio? Identifícate";
-	    			document.getElementById("botonEditar").style.visibility = "hidden";
-	    		}
-
-	    		console.log("Estado: " + correcto);
-      			$scope.closeLogin();
-
    	    	},
    	    	error: function(error) {
    	        	console.log("Error: " + error.code + " " + error.message);
@@ -116,13 +106,14 @@ angular.module('controladoresApp', ['serviciosApp'])
   	$scope.identificar = function() {
   		console.log('Identificando', $scope.loginData);
 
-  		var usuario = $scope.loginData.username;
+  		var email = $scope.loginData.username;
 		var password = $scope.loginData.password;
+		var nombre;
 
    		var UserObject = Parse.Object.extend("UserObject");
    		var query = new Parse.Query(UserObject);
    		var correcto = false;
-   		query.equalTo("usuario", usuario);
+   		query.equalTo("email", email);
 
    		// Función de Parse que busca la primera ocurrencia de lo especificado anteriormente
    		// (como sólo habrá un usuario registrado con un mismo email, esto será suficiente)
@@ -137,6 +128,7 @@ angular.module('controladoresApp', ['serviciosApp'])
    	        	if (object != undefined) {
 	   	        	if (password == object.get("password")) {
 	   	        		correcto = true;
+	   	        		nombre = object.get("nombre");
 	   	        		toast.template = 'Identificado con éxito';
 	   	        		$ionicLoading.show(toast);
 	   	        	} else {
@@ -149,7 +141,7 @@ angular.module('controladoresApp', ['serviciosApp'])
 	   	        }
 				
 				if(correcto) {
-	    			$scope.loginData.identificado = "Bienvenido, " + usuario;
+	    			$scope.loginData.identificado = "Bienvenido, " + nombre;
 	    			document.getElementById("botonEditar").style.visibility = "visible";
 	    		} else {
 	    			$scope.loginData.identificado = "¿Eres dueño de un negocio? Identifícate";
