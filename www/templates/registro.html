@@ -7,28 +7,29 @@
 	<ion-content>
 		<div class="list">
 		  <label class="item item-input item-stacked-label">
-		    <span class="input-label">Nombre</span>
-		    <input type="text" placeholder="John" ng-model="loginData.nombre">
+		    <input type="text" placeholder="Nombre" ng-model="loginData.nombre">
 		  </label>
 		  <label class="item item-input item-stacked-label">
-		    <span class="input-label">Apellidos</span>
-		    <input type="text" placeholder="Doe" ng-model="loginData.apellidos">
+		    <input type="text" placeholder="Apellidos" ng-model="loginData.apellidos">
 		  </label>
 		  <label class="item item-input item-stacked-label">
-		    <span class="input-label">Contraseña</span>
-		    <input type="password" ng-model="loginData.password">
+		    <input type="password" placeholder="Contraseña" ng-model="loginData.password">
 		  </label>
 		  <label class="item item-input item-stacked-label">
-		    <span class="input-label">Correo electrónico</span>
-		    <input type="text" placeholder="john@doe.com" ng-model="loginData.email">
+		    <input type="password" placeholder="Repetir contraseña" ng-model="loginData.repassword">
 		  </label>
 		  <label class="item item-input item-stacked-label">
-		    <span class="input-label">Nombre del local</span>
-		    <input type="text" placeholder="Bar Pepe" ng-model="loginData.local">
+		    <input type="text" placeholder="Correo electrónico" ng-model="loginData.email">
 		  </label>
-		  <button class="button button-block button-positive" ui-sref="mapa">Elegir ubicación</button>
+		  <label class="item item-input item-stacked-label">
+		    <input type="text" placeholder="Nombre del local" ng-model="loginData.local">
+		  </label>
+		  <button class="button button-block button-positive" id="boton_abre_mapa" ui-sref="mapa">
+		  	Elegir ubicación del local <img src="img/ic_done.png" width="30" height="30" id="elegir_hecho" style="visibility:hidden">
+		  </button>
+		  <span ng-model="localizacion">Latitud: {{localizacion.latitud}} Longitud: {{localizacion.longitud}}</span>
 		</div>
-		<button class="button button-block button-positive" ng-click="registra()">Registrame</button>
+		<button class="button button-block button-positive" ng-click="registra()">Regístrame</button>
 	</ion-content>
 	</ion-pane> 
 </ion-view>

@@ -22,8 +22,6 @@ angular.module('ofertasApp', ['ionic', 'controladoresApp'])
 // Para la navegación entre vistas
 .config(function($stateProvider, $urlRouterProvider) {
   $urlRouterProvider.otherwise('/')
-  
-  console.log("Carga vista");
 
 // Vista principal, que es la que se carga si no hay nada (especificado en el otherwise)
   $stateProvider.state('ofertas', {

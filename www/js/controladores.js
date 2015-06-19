@@ -3,6 +3,8 @@ angular.module('controladoresApp', ['serviciosApp'])
 .controller('controladorOfertas', function($scope, servicioOfertas, $state) {
   $scope.ofertas = servicioOfertas.ofertas;
 
+  console.log("Carga main");
+
   $scope.preferencias = function() {
 		console.log("Cambia vista a preferencias");
 		$state.go('preferencias');
@@ -18,8 +20,7 @@ angular.module('controladoresApp', ['serviciosApp'])
 
 //----------------------------------------Preferencias---------------------------------------------------------------
 
-.controller('controladorPreferencias', function($scope, $ionicModal, $timeout, $ionicLoading, $state) {
-  
+.controller('controladorPreferencias', function($scope, $ionicModal, $timeout, $state, $ionicLoading) {
   // Prepara las preferencias de usuario sobre recibir notificaciones
   $scope.recibirNotificaciones = {checked: true};
 
@@ -161,13 +162,28 @@ angular.module('controladoresApp', ['serviciosApp'])
 
 //----------------------------------------Registro-------------------------------------------------------------------
 
-.controller('controladorRegistro', function($scope, $ionicLoading, $ionicHistory) {
+.controller('controladorRegistro', function($scope, $ionicLoading, $ionicHistory, geodatos) {
+	
+	$scope.$on('$ionicView.beforeEnter', function () {
+       	console.log("Comprueba los geodatos");
+		if (geodatos.getLocalizacion().longitud != undefined) {
+			console.log("Cargando geodatos: " + geodatos.getLocalizacion().latitud + ", " + geodatos.getLocalizacion().longitud);
+			$scope.localizacion = {};
+			$scope.localizacion.longitud = geodatos.getLocalizacion().longitud;
+			$scope.localizacion.latitud = geodatos.getLocalizacion().latitud;
+		}
+ 	});
 
 	// Crea los datos para el login modal
   	$scope.loginData = {};
 	
 	// Función que registra a un usuario
 	$scope.registra = function() {
+		if ($scope.loginData.password != $scope.loginData.repassword) {
+			$ionicLoading.show({template: 'La contraseña no coincide', noBackdrop: true, duration: 1500});
+			return undefined;
+		}
+
 		var email = $scope.loginData.email;
 		var nombre = $scope.loginData.nombre;
 		var apellidos = $scope.loginData.apellidos;
@@ -197,6 +213,8 @@ angular.module('controladoresApp', ['serviciosApp'])
 		        	user.set("apellidos", apellidos);
 		        	user.set("email", email);
 		        	user.set("local", local);
+		        	user.set("latitud", $scope.localizacion.latitud);
+		        	user.set("longitud", $scope.localizacion.longitud);
 
 		        	user.save(null, {});
 
@@ -213,10 +231,8 @@ angular.module('controladoresApp', ['serviciosApp'])
 })
 
 
-.controller('controladorMapa', function($scope, $ionicLoading) {
-  	$scope.lat = 46.15242437752303;
-  	$scope.lon = 2.7470703125;
-
+.controller('controladorMapa', function($scope, $ionicLoading, $ionicHistory, geodatos) {
+  	
   	// Código del plugin location picker
   	/* Búsqueda de posición inicial
   		Realiza una primera búsqueda de la ubicación del dispositivo:
@@ -224,17 +240,24 @@ angular.module('controladoresApp', ['serviciosApp'])
   		- Si no puede recibir ubicación, inicia el mapa en una posición predefinida.
   	*/
   	navigator.geolocation.getCurrentPosition(function (pos) {
-	      console.log('Got pos', pos);
 	      $('#mapa').locationpicker({
 				location: {latitude: pos.coords.latitude, longitude: pos.coords.longitude},	
-				radius: 300,
+				radius: 0,
+				inputBinding: {
+			        latitudeInput: $('#latitud'),
+			        longitudeInput: $('#longitud'),
+			    }
 			});
 
 	    }, function (error) {
 	      alert('Unable to get location: ' + error.message);
 	      $('#mapa').locationpicker({
 				location: {latitude: 46.15242437752303, longitude: 2.7470703125},	
-				radius: 300,
+				radius: 0,
+				inputBinding: {
+			        latitudeInput: $('#latitud'),
+			        longitudeInput: $('#longitud'),
+			    }
 			});
 	    });
 
@@ -242,13 +265,32 @@ angular.module('controladoresApp', ['serviciosApp'])
   	$scope.centrar = function() {
   		console.log("Se va a centrar la posición");
   		navigator.geolocation.getCurrentPosition(function (pos) {
-	      console.log('Got pos ', pos.coords);
 	      
-	      var location = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+	      document.getElementById("latitud").value = pos.coords.latitude;
+  		  document.getElementById("longitud").value = pos.coords.longitude;
+	      $('#mapa').locationpicker({
+				location: {latitude: pos.coords.latitude, longitude: pos.coords.longitude},	
+				radius: 0,
+				inputBinding: {
+			        latitudeInput: $('#latitud'),
+			        longitudeInput: $('#longitud'),
+			    }
+			});
 
 	    }, function (error) {
 	      alert('Unable to get location: ' + error.message);
 	    });
+  	}
+
+  	// Función que se activa al confirmar, guardando la localización
+  	$scope.confirmar = function() {
+  		var lat = document.getElementById("latitud").value;
+  		var lon = document.getElementById("longitud").value;
+  		console.log("Guardando datos: " + lat + ", " + lon);
+  		geodatos.setLocalizacion(lat,lon);
+  		document.getElementById("elegir_hecho").style.visibility = "visible";
+  		document.getElementById("boton_abre_mapa").className = "button button-block button-balanced";
+  		$ionicHistory.goBack();
   	}
 
   	// Código de google maps API
