@@ -1,0 +1,26 @@
+<ion-view view-title="Mapa">
+
+	<ion-nav-title>
+	  Mapa
+	</ion-nav-title>
+	<ion-pane> 
+	<ion-content scroll="false">
+
+		<div id="mapa" style="width: 100%; height: 100%;"></div>
+		<input type="text" class="form-control" style="visibility:hidden" id="latitud"/>
+		<input type="text" class="form-control" style="visibility:hidden" id="longitud"/>
+	</ion-content>
+
+	<!-- Barra inferior con las opciones típicas -->
+	<ion-footer-bar align-title="left" class="bar-positive">
+	  <div class="buttons" ng-click="centrar()">
+	    <button class="button button-clear"><img src="img/ic_gps.png" alt="Mi ubicación" width="34" height="34"></button>
+	  </div>
+	  <h1 class="title"></h1>
+	  <div class="buttons" ng-click="confirmar()">
+	    <button class="button button-large button-balanced">Confirmar</button>
+	  </div>
+	</ion-footer-bar>
+
+	</ion-pane> 
+</ion-view>

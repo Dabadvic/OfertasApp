@@ -212,6 +212,72 @@ angular.module('controladoresApp', ['serviciosApp'])
     };
 })
 
+
+.controller('controladorMapa', function($scope, $ionicLoading) {
+  	$scope.lat = 46.15242437752303;
+  	$scope.lon = 2.7470703125;
+
+  	// Código del plugin location picker
+  	/* Búsqueda de posición inicial
+  		Realiza una primera búsqueda de la ubicación del dispositivo:
+  		- Si recibe ubicación, inicia el mapa en ese lugar. 
+  		- Si no puede recibir ubicación, inicia el mapa en una posición predefinida.
+  	*/
+  	navigator.geolocation.getCurrentPosition(function (pos) {
+	      console.log('Got pos', pos);
+	      $('#mapa').locationpicker({
+				location: {latitude: pos.coords.latitude, longitude: pos.coords.longitude},	
+				radius: 300,
+			});
+
+	    }, function (error) {
+	      alert('Unable to get location: ' + error.message);
+	      $('#mapa').locationpicker({
+				location: {latitude: 46.15242437752303, longitude: 2.7470703125},	
+				radius: 300,
+			});
+	    });
+
+  	// Función para centrar el mapa en el usuario
+  	$scope.centrar = function() {
+  		console.log("Se va a centrar la posición");
+  		navigator.geolocation.getCurrentPosition(function (pos) {
+	      console.log('Got pos ', pos.coords);
+	      
+	      var location = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+
+	    }, function (error) {
+	      alert('Unable to get location: ' + error.message);
+	    });
+  	}
+
+  	// Código de google maps API
+  	$scope.mapCreated = function(map) {
+    	$scope.map = map;
+  	};
+
+  	$scope.centerOnMe = function () {
+	    console.log("Centering");
+	    if (!$scope.map) {
+	      return;
+	    }
+
+	    $scope.loading = $ionicLoading.show({
+	      content: 'Getting current location...',
+	      showBackdrop: false
+	    });
+
+	    navigator.geolocation.getCurrentPosition(function (pos) {
+	      console.log('Got pos', pos);
+	      $scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+	      $scope.loading.hide();
+	    }, function (error) {
+	      alert('Unable to get location: ' + error.message);
+	    });
+  	};
+
+})
+
 .controller('controladorDetalles', function($scope, oferta) {
   $scope.oferta = oferta
 });
