@@ -81,6 +81,8 @@ angular.module('controladoresApp', ['serviciosApp'])
 	   	        		$ionicLoading.show(toast);
 	   	        		$state.go('registro');
 	   	        		$scope.closeLogin();
+	   	        		
+	   	        		//Marcar la clave como usada
 	   	        		/*
 	   	        		usada = true;
 
