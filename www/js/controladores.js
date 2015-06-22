@@ -1,14 +1,21 @@
 angular.module('controladoresApp', ['serviciosApp'])
 
 .controller('controladorOfertas', function($scope, servicioOfertas, $state) {
-  $scope.ofertas = servicioOfertas.ofertas;
+  $scope.ofertas = servicioOfertas.getOfertas();
 
   console.log("Carga main");
 
   $scope.preferencias = function() {
-		console.log("Cambia vista a preferencias");
-		$state.go('preferencias');
-	}
+	console.log("Cambia vista a preferencias");
+	$state.go('preferencias');
+  }
+
+  $scope.recargarDatos = function() {
+  	console.log("Se van a recargar los datos");
+  	servicioOfertas.cargarDatos();
+  	$scope.ofertas = servicioOfertas.getOfertas();
+  }
+
 })
 
 .controller('controladorBarra', function ($scope, $ionicHistory) {
