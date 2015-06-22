@@ -9,7 +9,7 @@ angular.module('serviciosApp', [])
     {nombre:"Taberna de Moe", descripcion:"Raciones 3x2", fin:"Hasta las 21:00", distancia:412}
   ];
 
-
+  /* Calcula la listancia entre dos puntos, con latitud y longitud */
   function distancia(lat1, lon1, lat2, lon2) {
     var R = 6371; // Radius of the earth in km
     var dLat = deg2rad(lat2-lat1);  // deg2rad below
@@ -25,6 +25,7 @@ angular.module('serviciosApp', [])
     return Math.round(d); //La devuelve redondeada
   };
 
+  /* Pasa de grados a radianes */
   function deg2rad(deg) {
     return deg * (Math.PI/180)
   };
@@ -36,6 +37,13 @@ angular.module('serviciosApp', [])
     getOferta: function(index) {
       return ofertas[index];
     },
+    /* Carga los datos de la base de datos en internet (Parse), para ello:
+        1. Obtiene la ubicación actual del dispositivo (para el cálculo de distancias).
+        2. Realiza la petición (query) al servidor indicando que añada el usuario al que pertenece la oferta.
+          - También reordena según la distancia
+
+        Con $ionicLoading muestra un mensaje de loading mientras se cargan los datos.
+    */ 
     cargarDatos: function() {
       var OfertaObject = Parse.Object.extend("OfertaObject");
       var query = new Parse.Query(OfertaObject);
@@ -45,7 +53,7 @@ angular.module('serviciosApp', [])
 
       var userLat; 
       var userLon;
-      navigator.geolocation.getCurrentPosition(function (pos) {
+      navigator.geolocation.getCurrentPosition(function (pos) { // Obtener la ubicación
         console.log('Got pos', pos);
         userLat = pos.coords.latitude; 
         userLon = pos.coords.longitude;
@@ -54,11 +62,12 @@ angular.module('serviciosApp', [])
           template: 'loading'
         });
 
-        query.find({
+        query.find({  // Petición query
           success: function(results) {
             // Por cada elemento devuelto, se guarda en ofertas
             for(var i=0; i < results.length; i++) {
               var user = results[i].get("usuario");
+              
               ofertas.push({
                 nombre: results[i].get("local"),
                 descripcion: results[i].get("descripcion_corta"),
@@ -82,7 +91,7 @@ angular.module('serviciosApp', [])
             alert("No leo de la base de datos");
           }
         });
-        
+
       }, function (error) {
         alert('Unable to get location: ' + error.message);
       });
@@ -91,6 +100,7 @@ angular.module('serviciosApp', [])
   }
 })
 
+/* Servicio usado para guardar los datos que el usuario elige al registrarse */
 .factory('geodatos', function() {
   var lat;
   var lon;
