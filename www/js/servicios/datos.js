@@ -1,7 +1,7 @@
-angular.module('serviciosApp', [])
+angular.module('servicio.datos', [])
 
 /* Servicio principal que se encarga de manejar las ofertas */
-.factory('servicioOfertas', function($ionicLoading) {
+.factory('datos', function($ionicLoading, $ionicHistory) {
   // Básicas para pruebas
   var ofertas = [
     {nombre:"Bar Pepe", descripcion_corta:"2x1 en cerveza", fin:"Hasta las 22:00", distancia:223},
@@ -98,6 +98,48 @@ angular.module('serviciosApp', [])
         alert('Unable to get location: ' + error.message);
       });
 
+    },
+
+    guardarUsuario: function(usuario) {
+      var UserObject = Parse.Object.extend("UserObject");
+      var query = new Parse.Query(UserObject);
+
+      // Para comprobar la existencia del usuario, de momento sólo se permite una cuenta por email 
+      query.equalTo("email", usuario.email);
+
+      query.find({
+          success: function(results) {
+            if (results.length > 0) {
+                // El usuario ya existe
+            console.log("Usuario existente");
+            alert("Usuario existente");
+          } else {
+            // Crea el usuario si no existe
+
+              console.log('Registrando usuario: ', usuario.nombre);
+              var user = new UserObject();
+              
+              user.set("nombre", usuario.nombre);
+              user.set("password", usuario.password);
+              user.set("apellidos", usuario.apellidos);
+              user.set("email", usuario.email);
+              user.set("local", usuario.local);
+              user.set("latitud", usuario.localizacion.latitud);
+              user.set("longitud", usuario.localizacion.longitud);
+
+              user.save(null, {});
+
+          $ionicLoading.show({ template: 'Usuario registrado', noBackdrop: true, duration: 2000 });
+
+          $ionicHistory.goBack();
+          return true;
+          }
+        },
+          error: function(error) {
+              // Error
+              return false;
+        }
+      });
     }
   }
 })
@@ -125,19 +167,4 @@ angular.module('serviciosApp', [])
   };
 }])
 
-
-/* Servicio usado para guardar los datos que el usuario elige al registrarse */
-.factory('geodatos', function() {
-  var lat;
-  var lon;
-
-  return {
-    setLocalizacion: function(latitud, longitud) {
-      lat = latitud;
-      lon = longitud;
-    },
-    getLocalizacion: function() {
-      return {latitud: lat, longitud: lon};
-    },
-  }
-});
+;

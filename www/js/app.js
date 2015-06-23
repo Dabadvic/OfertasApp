@@ -1,5 +1,5 @@
 // Se indica el nombre del módulo y un array de los componentes que requiere
-angular.module('ofertasApp', ['ionic', 'controladoresApp'])
+angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Preferencias', 'controlador.Registro', 'controlador.editar'])
 
 // Este lo trae así por defecto
 .run(function($ionicPlatform) {
@@ -64,8 +64,8 @@ angular.module('ofertasApp', ['ionic', 'controladoresApp'])
     templateUrl: 'templates/oferta.html',
     controller: 'controladorDetalles',
     resolve: {
-      oferta: function($stateParams, servicioOfertas) {
-        return servicioOfertas.getOferta($stateParams.ofertaId)
+      oferta: function($stateParams, datos) {
+        return datos.getOferta($stateParams.ofertaId)
       }
     }
   })
