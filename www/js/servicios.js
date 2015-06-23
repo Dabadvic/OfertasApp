@@ -4,9 +4,9 @@ angular.module('serviciosApp', [])
 .factory('servicioOfertas', function($ionicLoading) {
   // Básicas para pruebas
   var ofertas = [
-    {nombre:"Bar Pepe", descripcion:"2x1 en cerveza", fin:"Hasta las 22:00", distancia:223},
-    {nombre:"Cafetería 4Esquinas", descripcion:"Cafe gratis 20 clientes", fin:"Usos restantes: 13", distancia:358},
-    {nombre:"Taberna de Moe", descripcion:"Raciones 3x2", fin:"Hasta las 21:00", distancia:412}
+    {nombre:"Bar Pepe", descripcion_corta:"2x1 en cerveza", fin:"Hasta las 22:00", distancia:223},
+    {nombre:"Cafetería 4Esquinas", descripcion_corta:"Cafe gratis 20 clientes", fin:"Usos restantes: 13", distancia:358},
+    {nombre:"Taberna de Moe", descripcion_corta:"Raciones 3x2", fin:"Hasta las 21:00", distancia:412}
   ];
 
   /* Calcula la listancia entre dos puntos, con latitud y longitud */
@@ -37,6 +37,7 @@ angular.module('serviciosApp', [])
     getOferta: function(index) {
       return ofertas[index];
     },
+
     /* Carga los datos de la base de datos en internet (Parse), para ello:
         1. Obtiene la ubicación actual del dispositivo (para el cálculo de distancias).
         2. Realiza la petición (query) al servidor indicando que añada el usuario al que pertenece la oferta.
@@ -69,8 +70,9 @@ angular.module('serviciosApp', [])
               var user = results[i].get("usuario");
               
               ofertas.push({
-                nombre: results[i].get("local"),
-                descripcion: results[i].get("descripcion_corta"),
+                nombre: user.get("local"),//results[i].get("local"),
+                descripcion_corta: results[i].get("descripcion_corta"),
+                descripcion: results[i].get("descripcion"),
                 fin: results[i].get("fin"),
                 distancia: distancia(
                   userLat, userLon, 
@@ -99,6 +101,30 @@ angular.module('serviciosApp', [])
     }
   }
 })
+
+.factory('$localstorage', ['$window', function($window) {
+  return {
+
+    // Clear everything !!! ------------
+    clear: function() {
+      $window.localStorage.clear();
+    },
+
+    set: function(key, value) {
+      $window.localStorage[key] = value;
+    },
+    get: function(key, defaultValue) {
+      return $window.localStorage[key] || defaultValue;
+    },
+    setObject: function(key, value) {
+      $window.localStorage[key] = JSON.stringify(value);
+    },
+    getObject: function(key) {
+      return JSON.parse($window.localStorage[key] || '{}');
+    }
+  };
+}])
+
 
 /* Servicio usado para guardar los datos que el usuario elige al registrarse */
 .factory('geodatos', function() {

@@ -37,18 +37,25 @@ angular.module('ofertasApp', ['ionic', 'controladoresApp'])
     controller: 'controladorPreferencias'
   })
 
-// Vista con las preferencias de usuario
+// Vista con el registro de usuario
   $stateProvider.state('registro', {
     url: '/settings/registro',
     templateUrl: 'templates/registro.html',
     controller: 'controladorRegistro'
   })
 
-  // Vista con las preferencias de usuario
+  // Vista con el mapa para la elección de lugar
   $stateProvider.state('mapa', {
     url: '/settings/registro/mapa',
     templateUrl: 'templates/mapa.html',
     controller: 'controladorMapa'
+  })
+
+  // Vista para editar el perfil de un usuario (basada en la vista de registro)
+  $stateProvider.state('editarPerfil', {
+    url: '/settings/editarperfil',
+    templateUrl: 'templates/registro.html',
+    controller: 'controladorEditarPerfil'
   })
 
 // Vista que lleva al detalle de una oferta concreta

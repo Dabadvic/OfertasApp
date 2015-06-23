@@ -1,7 +1,7 @@
 <ion-view view-title="Registro">
 
 	<ion-nav-title>
-	  Registro
+	  {{titulo}}
 	</ion-nav-title>
 	<ion-pane> 
 	<ion-content>
@@ -13,7 +13,7 @@
 		    <input type="text" placeholder="Apellidos" ng-model="loginData.apellidos">
 		  </label>
 		  <label class="item item-input item-stacked-label">
-		    <input type="password" placeholder="Contraseña" ng-model="loginData.password">
+		    <input type="password" id="textPass" placeholder="Contraseña" ng-model="loginData.password">
 		  </label>
 		  <label class="item item-input item-stacked-label">
 		    <input type="password" placeholder="Repetir contraseña" ng-model="loginData.repassword">
@@ -29,7 +29,7 @@
 		  </button>
 		  <span ng-model="localizacion">Latitud: {{localizacion.latitud}} Longitud: {{localizacion.longitud}}</span>
 		</div>
-		<button class="button button-block button-positive" ng-click="registra()">Regístrame</button>
+		<button class="button button-block button-positive" id="botonRegistro" ng-click="registra()">Regístrame</button>
 	</ion-content>
 	</ion-pane> 
 </ion-view>

@@ -1,9 +1,13 @@
 angular.module('controladoresApp', ['serviciosApp'])
 
-.controller('controladorOfertas', function($scope, servicioOfertas, $state) {
+.controller('controladorOfertas', function($scope, servicioOfertas, $state, $localstorage) {
   $scope.ofertas = servicioOfertas.getOfertas();
 
   console.log("Carga main");
+
+  $scope.$on('$ionicView.beforeEnter', function() {
+	$scope.nombre = $localstorage.get("user", "");
+  })
 
   $scope.preferencias = function() {
 	console.log("Cambia vista a preferencias");
@@ -20,20 +24,38 @@ angular.module('controladoresApp', ['serviciosApp'])
 
 .controller('controladorBarra', function ($scope, $ionicHistory) {
   	$scope.atras = function() {
-  		console.log("Vuelve atrás");
     	$ionicHistory.goBack();
   	};
 })
 
 //----------------------------------------Preferencias---------------------------------------------------------------
 
-.controller('controladorPreferencias', function($scope, $ionicModal, $timeout, $state, $ionicLoading) {
+.controller('controladorPreferencias', function($scope, $ionicModal, $timeout, $state, $ionicLoading, $localstorage) {
   // Prepara las preferencias de usuario sobre recibir notificaciones
   $scope.recibirNotificaciones = {checked: true};
+
+  $scope.identifica = function() {
+  	if($localstorage.get("identificado", false)) {
+	    $scope.loginData.identificado = "Bienvenido, " + $localstorage.get("user", "") + ". Desconectarse";
+	    document.getElementById("botonEditar").style.visibility = "visible";
+	} else {
+	    $scope.loginData.identificado = "¿Eres dueño de un negocio? Identifícate";
+	    document.getElementById("botonEditar").style.visibility = "hidden";
+	}
+  }
+
+  $scope.$on('$ionicView.beforeEnter', function() {
+	$scope.identifica();
+  })
 
   $scope.notificaciones = function() {
     console.log('Cambio preferencias recibir notificaciones', $scope.recibirNotificaciones.checked);
   };
+
+  $scope.irEditarPerfil = function() {
+  	console.log("Va a editar perfil");
+  	$state.go('editarPerfil');
+  }
 
   //----------------------------Login---------------------------------
   
@@ -57,10 +79,16 @@ angular.module('controladoresApp', ['serviciosApp'])
 
   // Abre el login, reiniciando los campos por si han sido utilizados antes
   $scope.login = function() {
-    $scope.modal.show();
-    $scope.loginData.username = '';
-	$scope.loginData.password = '';
-	$scope.loginData.key = '';
+  	if(!$localstorage.get("identificado", false)) {
+    	$scope.modal.show();
+	    $scope.loginData.username = '';
+		$scope.loginData.password = '';
+		$scope.loginData.key = '';
+	} else {
+		$localstorage.clear();
+		$scope.identifica();
+	}
+
   };
 
   // Función que asigna al botón registrar la función de ir a la vista de registro
@@ -140,6 +168,12 @@ angular.module('controladoresApp', ['serviciosApp'])
 	   	        		correcto = true;
 	   	        		nombre = object.get("nombre");
 	   	        		toast.template = 'Identificado con éxito';
+
+	   	        		// Guarda las preferencias:
+	   	        		$localstorage.set("user", nombre);
+	   	        		$localstorage.set("email", object.get("email"));
+	   	        		$localstorage.set("identificado", true);
+
 	   	        		$ionicLoading.show(toast);
 	   	        	} else {
 	   	        		toast.template = 'Contraseña incorrecta';
@@ -150,13 +184,7 @@ angular.module('controladoresApp', ['serviciosApp'])
 	   	        	$ionicLoading.show(toast);
 	   	        }
 				
-				if(correcto) {
-	    			$scope.loginData.identificado = "Bienvenido, " + nombre;
-	    			document.getElementById("botonEditar").style.visibility = "visible";
-	    		} else {
-	    			$scope.loginData.identificado = "¿Eres dueño de un negocio? Identifícate";
-	    			document.getElementById("botonEditar").style.visibility = "hidden";
-	    		}
+	   	        $scope.identifica();
 
 	    		console.log("Estado: " + correcto);
       			$scope.closeLogin();
@@ -172,7 +200,8 @@ angular.module('controladoresApp', ['serviciosApp'])
 //----------------------------------------Registro-------------------------------------------------------------------
 
 .controller('controladorRegistro', function($scope, $ionicLoading, $ionicHistory, geodatos) {
-	
+	$scope.titulo = "Registro";
+
 	$scope.$on('$ionicView.beforeEnter', function () {
        	console.log("Comprueba los geodatos");
 		if (geodatos.getLocalizacion().longitud != undefined) {
@@ -248,27 +277,42 @@ angular.module('controladoresApp', ['serviciosApp'])
   		- Si recibe ubicación, inicia el mapa en ese lugar. 
   		- Si no puede recibir ubicación, inicia el mapa en una posición predefinida.
   	*/
-  	navigator.geolocation.getCurrentPosition(function (pos) {
-	      $('#mapa').locationpicker({
-				location: {latitude: pos.coords.latitude, longitude: pos.coords.longitude},	
+  	$scope.$on('$ionicView.beforeEnter', function () {
+       	console.log("Comprueba los geodatos");
+		if (geodatos.getLocalizacion().longitud != undefined) {
+			console.log("Cargando geodatos: " + geodatos.getLocalizacion().latitud + ", " + geodatos.getLocalizacion().longitud);
+			$('#mapa').locationpicker({
+				location: {latitude: geodatos.getLocalizacion().latitud, longitude: geodatos.getLocalizacion().longitud},	
 				radius: 0,
 				inputBinding: {
 			        latitudeInput: $('#latitud'),
 			        longitudeInput: $('#longitud'),
 			    }
 			});
+		} else {
+			navigator.geolocation.getCurrentPosition(function (pos) {
+		      $('#mapa').locationpicker({
+					location: {latitude: pos.coords.latitude, longitude: pos.coords.longitude},	
+					radius: 0,
+					inputBinding: {
+				        latitudeInput: $('#latitud'),
+				        longitudeInput: $('#longitud'),
+				    }
+				});
 
-	    }, function (error) {
-	      alert('Unable to get location: ' + error.message);
-	      $('#mapa').locationpicker({
-				location: {latitude: 46.15242437752303, longitude: 2.7470703125},	
-				radius: 0,
-				inputBinding: {
-			        latitudeInput: $('#latitud'),
-			        longitudeInput: $('#longitud'),
-			    }
-			});
-	    });
+		    }, function (error) {
+		      alert('Unable to get location: ' + error.message);
+		      $('#mapa').locationpicker({
+					location: {latitude: 46.15242437752303, longitude: 2.7470703125},	
+					radius: 0,
+					inputBinding: {
+				        latitudeInput: $('#latitud'),
+				        longitudeInput: $('#longitud'),
+				    }
+				});
+		    });
+		}
+ 	});
 
   	// Función para centrar el mapa en el usuario
   	$scope.centrar = function() {
@@ -329,6 +373,100 @@ angular.module('controladoresApp', ['serviciosApp'])
 
 })
 
+.controller('controladorEditarPerfil', function($scope, $localstorage, $ionicLoading, $ionicHistory, geodatos) {
+	// Comprueba los geodatos
+	$scope.$on('$ionicView.beforeEnter', function () {
+		if (geodatos.getLocalizacion().longitud != undefined) {
+			console.log("Cargando geodatos: " + geodatos.getLocalizacion().latitud + ", " + geodatos.getLocalizacion().longitud);
+			$scope.localizacion = {};
+			$scope.localizacion.longitud = geodatos.getLocalizacion().longitud;
+			$scope.localizacion.latitud = geodatos.getLocalizacion().latitud;
+		}
+ 	});
+
+	document.getElementById("textPass").placeholder = "Contraseña (dejar para mantenerla)";
+	document.getElementById("botonRegistro").innerHTML = "Guardar cambios";
+	$scope.titulo = "Editar Perfil";
+	$scope.loginData = {};
+	var email = $localstorage.get("email", "");
+	var UserObject = Parse.Object.extend("UserObject");
+   	var query = new Parse.Query(UserObject);
+   	query.equalTo("email", email);
+
+   	$ionicLoading.show({
+        template: 'loading'
+    });
+
+   	query.first({
+   	    success: function(usuario) {
+   	  		// Si no lo encuentra devuelve undefined
+   	        if (usuario != undefined) {
+	   	    	$scope.loginData.email = usuario.get("email");
+				$scope.loginData.nombre = usuario.get("nombre");
+				$scope.loginData.apellidos = usuario.get("apellidos");
+				$scope.loginData.local = usuario.get("local");
+
+				$scope.localizacion = {};
+				$scope.localizacion.latitud = usuario.get("latitud");
+		        $scope.localizacion.longitud = usuario.get("longitud");
+
+		        geodatos.setLocalizacion($scope.localizacion.latitud, $scope.localizacion.longitud);
+	   	    } else {
+	   	        console.log("Error al editar datos, email no encontrado");
+	   	    }
+	   	    $ionicLoading.hide();
+   	    },
+   	    error: function(error) {
+   	        console.log("Error: " + error.code + " " + error.message);
+	    }
+    });
+
+   	$scope.registra = function() {
+   		var email = $scope.loginData.email;
+		var nombre = $scope.loginData.nombre;
+		var apellidos = $scope.loginData.apellidos;
+		var local = $scope.loginData.local;
+		if ($scope.loginData.password) {
+			console.log("Cambiamos el password");
+			if ($scope.loginData.password != $scope.loginData.repassword) {
+				$ionicLoading.show({template: 'La contraseña no coincide', noBackdrop: true, duration: 1500});
+				return undefined;
+			}
+			var password = $scope.loginData.password;
+		}
+
+		$localstorage.set("user", nombre);
+		$localstorage.set("email", email);
+
+		query.first({
+	   	    success: function(usuario) {
+	   	  		// Si no lo encuentra devuelve undefined
+	   	        if (usuario != undefined) {
+		   	    	usuario.set("nombre", nombre);
+
+		   	    	if (password)
+		        		usuario.set("password", password);
+
+		        	usuario.set("apellidos", apellidos);
+		        	usuario.set("email", email);
+		        	usuario.set("local", local);
+		        	usuario.set("latitud", $scope.localizacion.latitud);
+		        	usuario.set("longitud", $scope.localizacion.longitud);
+
+		        	usuario.save(null, {});
+		   	    } else {
+		   	        console.log("Error al confirmar, email no encontrado");
+		   	    }
+	   	    },
+	   	    error: function(error) {
+	   	        console.log("Error: " + error.code + " " + error.message);
+		    }
+	    });
+	    $ionicHistory.goBack();
+   	}
+
+})
+
 .controller('controladorDetalles', function($scope, oferta) {
-  $scope.oferta = oferta
+  $scope.oferta = oferta;
 });
