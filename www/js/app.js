@@ -58,6 +58,13 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Pre
     controller: 'controladorEditarPerfil'
   })
 
+  // Vista para publicar una oferta
+  $stateProvider.state('publicarOferta', {
+    url: '/settings/publicaoferta',
+    templateUrl: 'templates/publicar_oferta.html',
+    controller: 'controladorPublicar'
+  })
+
 // Vista que lleva al detalle de una oferta concreta
   $stateProvider.state('detalle', {
     url: '/:ofertaId',

@@ -140,7 +140,38 @@ angular.module('servicio.datos', [])
               return false;
         }
       });
-    }
+    },
+
+    guardarOferta: function(oferta, usuario) {
+      var OfertaObject = Parse.Object.extend("OfertaObject");
+
+      console.log('Registrando oferta: ', usuario.nombre);
+      var ofer = new OfertaObject();
+              
+      ofer.set("descripcion", oferta.descripcion);
+      ofer.set("descripcion_corta", oferta.descripcion_corta);
+      ofer.set("duracion", oferta.duracion);
+      ofer.set("usos", oferta.usos);
+
+      var UserObject = Parse.Object.extend("UserObject");
+      var query = new Parse.Query(UserObject);
+      query.get(usuario, {
+          success: function(user) {
+            ofer.set("usuario", user);
+            ofer.save(null, {
+              success: function(gameScore) {
+                $ionicLoading.show({ template: 'Oferta creada', noBackdrop: true, duration: 2000 });
+              },
+              error: function(gameScore, error) {
+                alert('Failed to create new object, with error code: ' + error.message);
+              }
+            });
+          },
+          error: function(object, error) {
+            
+          }
+      });
+    },
   }
 })
 

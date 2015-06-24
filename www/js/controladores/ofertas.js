@@ -30,4 +30,17 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas'])
 
 .controller('controladorDetalles', function($scope, oferta) {
   $scope.oferta = oferta;
-});
+})
+
+.controller('controladorPublicar', function($scope, datos, $localstorage, $ionicHistory) {
+	$scope.oferta = {};
+	$scope.titulo = "Publicar Oferta";
+
+	$scope.publica = function() {
+		datos.guardarOferta($scope.oferta, $localstorage.get("id", undefined));
+
+		$ionicHistory.goBack();
+	}
+})
+
+;

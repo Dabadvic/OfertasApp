@@ -8,14 +8,16 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
   	if($localstorage.get("identificado", false)) {
 	    $scope.loginData.identificado = "Bienvenido, " + $localstorage.get("user", "") + ". Desconectarse";
 	    document.getElementById("botonEditar").style.visibility = "visible";
-	} else {
+        document.getElementById("botonPublicar").style.visibility = "visible";
+    } else {
 	    $scope.loginData.identificado = "¿Eres dueño de un negocio? Identifícate";
 	    document.getElementById("botonEditar").style.visibility = "hidden";
-	}
+        document.getElementById("botonPublicar").style.visibility = "hidden";
+    }
   }
 
   $scope.$on('$ionicView.beforeEnter', function() {
-	$scope.identifica();
+    $scope.identifica();
   })
 
   $scope.notificaciones = function() {
@@ -28,8 +30,6 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
   }
 
   //----------------------------------------------------Login-------------------------------------------------------------------------
-  
-  document.getElementById("botonEditar").style.visibility = "hidden";
 
   // Crea los datos para el login modal
   $scope.loginData = {};
@@ -141,6 +141,7 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
 
 	   	        		// Guarda las preferencias:
 	   	        		$localstorage.set("user", nombre);
+                  $localstorage.set("id", object.id);
 	   	        		$localstorage.set("email", object.get("email"));
 	   	        		$localstorage.set("identificado", true);
 
