@@ -16,15 +16,15 @@
 		  </label>
 		  </label>
 		  <label class="item item-input item-stacked-label">
-		  	<span class="input-label">Duración</span>
-		    <input type="text" placeholder="Dejar en blanco si sólo va a tener usos" ng-model="oferta.duracion">
+		  	<span class="input-label">Duración (Dejar en blanco si sólo va a tener usos)</span>
+		    <input type="datetime-local" ng-model="oferta.duracion">
 		  </label>
 		  <label class="item item-input item-stacked-label">
 		  	<span class="input-label">Usos</span>
 		    <input type="text" placeholder="Dejar en blanco si sólo va a tener duración" ng-model="oferta.usos">
 		  </label>
 		</div>
-		<button class="button button-block button-positive" id="botonRegistro" ng-click="publica()">Publicar</button>
+		<button class="button button-block button-positive" id="botonRegistro" ng-click="publicar()">Publicar</button>
 	</ion-content>
 	</ion-pane> 
 </ion-view>

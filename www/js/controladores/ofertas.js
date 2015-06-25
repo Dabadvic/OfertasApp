@@ -1,6 +1,6 @@
 angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas'])
 
-.controller('controladorOfertas', function($scope, datos, $state, $localstorage) {
+.controller('controladorOfertas', function($scope, datos, $state, $localstorage, $ionicLoading) {
   $scope.ofertas = datos.getOfertas();
 
   console.log("Carga main");
@@ -36,10 +36,12 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas'])
 	$scope.oferta = {};
 	$scope.titulo = "Publicar Oferta";
 
-	$scope.publica = function() {
+	$scope.publicar = function() {
 		datos.guardarOferta($scope.oferta, $localstorage.get("id", undefined));
 
 		$ionicHistory.goBack();
+		
+		console.log($scope.oferta);
 	}
 })
 

@@ -30,6 +30,19 @@ angular.module('servicio.datos', [])
     return deg * (Math.PI/180)
   };
 
+  /* Obtiene el texto que se mostrará al usuario como fin de la oferta */
+  function obtenerFin(duracion, usos) {
+    var fin = "";
+      if (usos != undefined) {
+        fin += "Usos: " + usos;
+      }
+      if (duracion != undefined) {
+        fin += " Hasta " + duracion.getHours() + ":" + ((duracion.getMinutes().toString().length == 1) ? "0" + duracion.getMinutes() : duracion.getMinutes());
+      }
+
+      return fin;
+  }
+
   return {
     getOfertas: function() {
       return ofertas;
@@ -55,7 +68,6 @@ angular.module('servicio.datos', [])
       var userLat; 
       var userLon;
       navigator.geolocation.getCurrentPosition(function (pos) { // Obtener la ubicación
-        console.log('Got pos', pos);
         userLat = pos.coords.latitude; 
         userLon = pos.coords.longitude;
 
@@ -69,11 +81,16 @@ angular.module('servicio.datos', [])
             for(var i=0; i < results.length; i++) {
               var user = results[i].get("usuario");
               
+              var duracion = results[i].get("duracion");
+              var usos = results[i].get("usos");
+              
               ofertas.push({
                 nombre: user.get("local"),//results[i].get("local"),
                 descripcion_corta: results[i].get("descripcion_corta"),
                 descripcion: results[i].get("descripcion"),
-                fin: results[i].get("fin"),
+                fin: obtenerFin(duracion, usos),
+                duracion: duracion,
+                usos: usos,
                 distancia: distancia(
                   userLat, userLon, 
                   user.get("latitud"),user.get("longitud")
@@ -86,6 +103,7 @@ angular.module('servicio.datos', [])
             });
 
             $ionicLoading.hide();
+            return ofertas;
           },
 
           error: function(error) {
