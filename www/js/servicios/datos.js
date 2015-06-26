@@ -34,7 +34,7 @@ angular.module('servicio.datos', [])
   function obtenerFin(duracion, usos) {
     var fin = "";
       if (usos != undefined) {
-        fin += "Usos: " + usos;
+        fin += "Restantes: " + usos;
       }
       if (duracion != undefined) {
         fin += " Hasta " + duracion.getHours() + ":" + ((duracion.getMinutes().toString().length == 1) ? "0" + duracion.getMinutes() : duracion.getMinutes());
@@ -94,7 +94,9 @@ angular.module('servicio.datos', [])
                 distancia: distancia(
                   userLat, userLon, 
                   user.get("latitud"),user.get("longitud")
-                  )
+                  ),
+                latitud: user.get("latitud"),
+                longitud: user.get("longitud")
               });
             }
 

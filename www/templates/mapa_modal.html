@@ -1,0 +1,13 @@
+<ion-modal-view>
+  <ion-header-bar>
+    <h1 class="title">Mapa</h1>
+    <div class="buttons">
+      <button class="button button-clear" ng-click="cierraMapa()">Cerrar</button>
+    </div>
+  </ion-header-bar>
+ <body>
+  <ion-content>
+      <map on-create="mapCreated(map)" control="mapControl"></map>
+  </ion-content>
+</body>
+</ion-modal-view>

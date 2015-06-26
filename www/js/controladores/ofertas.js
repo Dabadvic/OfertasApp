@@ -1,4 +1,4 @@
-angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas'])
+angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'ionic'])
 
 .controller('controladorOfertas', function($scope, datos, $state, $localstorage, $ionicLoading) {
   $scope.ofertas = datos.getOfertas();
@@ -28,8 +28,39 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas'])
   	};
 })
 
-.controller('controladorDetalles', function($scope, oferta) {
+
+.controller('controladorDetalles', function($scope, oferta, $ionicModal, $compile, $ionicLoading) {
   $scope.oferta = oferta;
+
+  $scope.mapControl = {
+  };
+
+  // Crear la ventana modal que usaremos para el mapa
+  $ionicModal.fromTemplateUrl('templates/mapa_modal.html', {
+    scope: $scope
+  }).then(function(modal) {
+    $scope.modal = modal;
+  });
+
+  $scope.abreMapa = function() {
+  	$scope.modal.show();
+
+  	$ionicLoading.show({
+        template: 'loading'
+    });
+
+  	navigator.geolocation.getCurrentPosition(function (pos) {
+  		$scope.mapControl.calcRoute(pos.coords.latitude, pos.coords.longitude, oferta.latitud, oferta.longitud);
+  		$ionicLoading.hide();
+  	}, function (error) {
+       alert('Unable to get location: ' + error.message);
+    });
+  }
+
+  $scope.cierraMapa = function() {
+    $scope.modal.hide();
+  }
+
 })
 
 .controller('controladorPublicar', function($scope, datos, $localstorage, $ionicHistory) {
