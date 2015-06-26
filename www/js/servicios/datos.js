@@ -58,7 +58,7 @@ angular.module('servicio.datos', [])
 
         Con $ionicLoading muestra un mensaje de loading mientras se cargan los datos.
     */ 
-    cargarDatos: function() {
+    cargarDatos: function(usuarioId) {
       var OfertaObject = Parse.Object.extend("OfertaObject");
       var query = new Parse.Query(OfertaObject);
       ofertas = [];
@@ -84,20 +84,20 @@ angular.module('servicio.datos', [])
               var duracion = results[i].get("duracion");
               var usos = results[i].get("usos");
               
-              ofertas.push({
-                nombre: user.get("local"),//results[i].get("local"),
-                descripcion_corta: results[i].get("descripcion_corta"),
-                descripcion: results[i].get("descripcion"),
-                fin: obtenerFin(duracion, usos),
-                duracion: duracion,
-                usos: usos,
-                distancia: distancia(
-                  userLat, userLon, 
-                  user.get("latitud"),user.get("longitud")
-                  ),
-                latitud: user.get("latitud"),
-                longitud: user.get("longitud")
-              });
+                ofertas.push({
+                  nombre: user.get("local"),//results[i].get("local"),
+                  descripcion_corta: results[i].get("descripcion_corta"),
+                  descripcion: results[i].get("descripcion"),
+                  fin: obtenerFin(duracion, usos),
+                  duracion: duracion,
+                  usos: usos,
+                  distancia: distancia(
+                    userLat, userLon, 
+                    user.get("latitud"),user.get("longitud")
+                    ),
+                  latitud: user.get("latitud"),
+                  longitud: user.get("longitud")
+                });
             }
 
             ofertas.sort(function(a, b){

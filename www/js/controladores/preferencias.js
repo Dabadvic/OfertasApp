@@ -8,11 +8,13 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
   	if($localstorage.get("identificado", false)) {
 	    $scope.loginData.identificado = "Bienvenido, " + $localstorage.get("user", "") + ". Desconectarse";
 	    document.getElementById("botonEditar").style.visibility = "visible";
-        document.getElementById("botonPublicar").style.visibility = "visible";
+      document.getElementById("botonPublicar").style.visibility = "visible";
+      document.getElementById("botonOfertasPublicadas").style.visibility = "visible";
     } else {
 	    $scope.loginData.identificado = "¿Eres dueño de un negocio? Identifícate";
 	    document.getElementById("botonEditar").style.visibility = "hidden";
-        document.getElementById("botonPublicar").style.visibility = "hidden";
+      document.getElementById("botonPublicar").style.visibility = "hidden";
+      document.getElementById("botonOfertasPublicadas").style.visibility = "hidden";
     }
   }
 

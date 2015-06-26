@@ -76,4 +76,57 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 	}
 })
 
+
+.controller('controladorOfertasPublicadas', function($scope, datos, $localstorage, $ionicHistory, $ionicLoading) {
+	var OfertaObject = Parse.Object.extend("OfertaObject");
+    var query = new Parse.Query(OfertaObject);
+    var ofertas = [];
+    var hoy = new Date();
+    $scope.vigentes = [];
+    $scope.caducadas = [];
+    var usuarioId = $localstorage.get("id", undefined);
+
+    query.include("usuario");
+
+    $ionicLoading.show({
+        template: 'loading'
+    });
+
+        query.find({  // Petición query
+          success: function(results) {
+            // Por cada elemento devuelto, se guarda en ofertas
+          for(var i=0; i < results.length; i++) {
+            var user = results[i].get("usuario");
+              
+            if(usuarioId == user.id) {
+                ofertas.push({
+                  descripcion_corta: results[i].get("descripcion_corta"),
+                  descripcion: results[i].get("descripcion"),
+                  duracion: results[i].get("duracion"),
+                  usos: results[i].get("usos")
+                });
+            }
+          }
+
+          // Ordena ofertas por vigentes y caducadas
+          for(var i = 0; i < ofertas.length; i++) {
+          	var duracion = ofertas[i].duracion;
+          	ofertas[i].fin = duracion.getHours() + ":" + ((duracion.getMinutes().toString().length == 1) ? "0" + duracion.getMinutes() : duracion.getMinutes())
+          					+ " " + duracion.getDate() + "/" + (duracion.getMonth()+1) + "/" + duracion.getFullYear();
+          	if(Date.parse(ofertas[i].duracion) < Date.parse(hoy)) {
+          		$scope.caducadas.push(ofertas[i]);
+          	} else {
+          		$scope.vigentes.push(ofertas[i]);
+          	}
+          }
+
+            $ionicLoading.hide();
+          },
+
+          error: function(error) {
+            console.log("Error: " + error.code + " " + error.message);
+            alert("No leo de la base de datos");
+          }
+        });
+})
 ;

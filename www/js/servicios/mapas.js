@@ -63,8 +63,8 @@ angular.module('servicio.mapas', [])
       function initialize() {
         directionsDisplay = new google.maps.DirectionsRenderer();
         var mapOptions = {
-          center: new google.maps.LatLng(43.07493, -89.381388),
-          zoom: 16,
+          center: new google.maps.LatLng(0, 0),
+          zoom: 8,
           mapTypeId: google.maps.MapTypeId.ROADMAP
         };
         map = new google.maps.Map($element[0], mapOptions);

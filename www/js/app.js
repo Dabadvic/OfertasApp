@@ -65,13 +65,25 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Pre
     controller: 'controladorPublicar'
   })
 
+  // Vista con el listado de ofertas publicadas por un usuario
+  $stateProvider.state('ofertasPersonales', {
+    url: '/settings/ofertaspersonales',
+    templateUrl: 'templates/ofertas_publicadas.html',
+    controller: 'controladorOfertasPublicadas'
+  })
+
 // Vista que lleva al detalle de una oferta concreta
   $stateProvider.state('detalle', {
-    url: '/:ofertaId',
+    url: '/:ofertaId:oferta',
     templateUrl: 'templates/oferta.html',
     controller: 'controladorDetalles',
     resolve: {
       oferta: function($stateParams, datos) {
+        if (!$stateParams.ofertaId) {
+          var obj = JSON.parse($stateParams.oferta);
+          console.log(obj);
+          return obj;
+        }
         return datos.getOferta($stateParams.ofertaId)
       }
     }

@@ -1,0 +1,37 @@
+<ion-view view-title="Ofertas Personales">
+
+  <ion-nav-title>
+    Ofertas publicadas
+  </ion-nav-title>
+
+  <ion-pane>    
+    <ion-content>
+      <div class="item item-divider"> 
+        Vigentes
+      </div>
+      
+      <ion-list>
+        <ion-item ng-repeat="vigente in vigentes" ui-sref="detalle({oferta: '{{vigente}}'})">
+        <div>
+          <p> <h2 id="nombreOferta">{{vigente.descripcion_corta}}</h2> <h3 id="distanciaOferta">Fecha de fin: {{vigente.fin}}</h3> <br>
+           <h3 id="descripcionOferta">{{vigente.descripcion}}</h3><h3 id="finOferta">Usos restantes: {{vigente.usos}}</h3></p>
+        </div>
+        </ion-item>
+      </ion-list>
+      
+      <div class="item item-divider"> 
+        Caducadas
+      </div>
+
+      <ion-list>
+        <ion-item ng-repeat="caducada in caducadas" >
+        <div>
+          <p> <h2 id="nombreOferta">{{caducada.descripcion_corta}}</h2> <h3 id="distanciaOferta">Fecha de fin: {{caducada.fin}}</h3> <br>
+           <h3 id="descripcionOferta">{{caducada.descripcion}}</h3><h3 id="finOferta">Usos restantes: {{caducada.usos}}</h3></p>
+        </div>
+        </ion-item>
+      </ion-list>
+
+    </ion-content>
+  </ion-pane>
+</ion-view>
