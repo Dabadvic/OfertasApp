@@ -1,8 +1,6 @@
 angular.module('controlador.Preferencias', ['servicio.datos'])
 
 .controller('controladorPreferencias', function($scope, $ionicModal, $timeout, $state, $ionicLoading, $localstorage) {
-  // Prepara las preferencias de usuario sobre recibir notificaciones
-  $scope.recibirNotificaciones = {checked: true};
 
   $scope.identifica = function() {
   	if($localstorage.get("identificado", false)) {
@@ -19,11 +17,18 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
   }
 
   $scope.$on('$ionicView.beforeEnter', function() {
+    $scope.recibirNotificaciones = {checked: ($localstorage.get("notificaciones", true))};
+
+    if ($localstorage.get("notificaciones", true) == "false")
+      $scope.recibirNotificaciones = {checked: false};
+    else
+      $scope.recibirNotificaciones = {checked: true};
+
     $scope.identifica();
   })
 
   $scope.notificaciones = function() {
-    console.log('Cambio preferencias recibir notificaciones', $scope.recibirNotificaciones.checked);
+    $localstorage.set("notificaciones", $scope.recibirNotificaciones.checked);
   };
 
   $scope.irEditarPerfil = function() {

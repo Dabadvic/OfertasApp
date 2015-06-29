@@ -5,6 +5,11 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 
   $scope.$on('$ionicView.beforeEnter', function() {
 	$scope.nombre = $localstorage.get("user", "");
+
+	if ($localstorage.get("notificaciones", true) == "true")
+		window.parse.subscribeToChannel('news');
+	else
+		window.parse.unsubscribe('news');
   })
 
   $scope.preferencias = function() {
@@ -12,16 +17,18 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
   }
 
   $scope.recargarDatos = function() {
-  	datos.cargarDatos();
-  	$scope.ofertas = datos.getOfertas();
+  	//datos.cargarDatos();
+  	//$scope.ofertas = datos.getOfertas();
+
 
   	// Pruebas con notificaciones push
   	Parse.Push.send({
 	  channels: [ "news" ],
 	  data: {
-	    alert: "Hello World!"
+	    alert: "Mandado desde pc"
 	  }
 	},{});
+
   }
 
 })
