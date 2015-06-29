@@ -3,6 +3,9 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Pre
 
 // Este lo trae así por defecto
 .run(function($ionicPlatform) {
+
+  
+
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -15,7 +18,58 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Pre
 
     // Preparar Parse con la ID de la aplicación y la clave de JavaScript (ambas en la web)
     Parse.initialize("4R2V91bSep94FYqbspK1UkLIAL2Kd5IQJFCmZsMB", "aaHJB3mLTT2UmgaUyEvn2PQKBpO60WQDFqWNTodO");
-    
+    /*
+    // Rest call to Parse to Insert/Update the Installation record for this Device
+                $http({
+                    url: "https://api.parse.com/1/installations",
+                    method: "POST",
+                    data: {"deviceType": "android",
+                           "installationId": CommonService.parseInstallationId,
+                           "gcmRegId": e.regid,
+                           "testdevice": tester,
+                           "channels": [""] },
+                    headers:  {"X-Parse-Application-Id": CommonService.parse_appkey,
+                               "X-Parse-REST-API-Key": CommonService.parse_restkey,
+                               "Content-Type": "application/json"}
+                }).success(function (data, status, headers, config) {
+                    LogService.add("GCM RegID: " + e.regid);
+                    LogService.add("GCM Parse InstallationID: " + CommonService.parseInstallationId);
+                        //alert('GCM registered success = ' + data + ' Status ' + status); 
+                }).error(function (data, status, headers, config) {
+                        //alert('GCM registered failure = ' + data + ' Status ' + status);
+                });
+*/
+
+//-------------------------------------------------------------------------------
+var applicationId = "4R2V91bSep94FYqbspK1UkLIAL2Kd5IQJFCmZsMB";
+var clientKey = "BWlU4AtdgyJsSLklJTYN4nk9cWpQNeuXZPxbALtp";
+//call registerAsPushNotificationClient internally
+  window.parse.setUp(applicationId, clientKey);
+  
+  //registerAsPushNotificationClient callback
+  window.parse.onRegisterAsPushNotificationClientSucceeded = function() {
+    alert('Registrado como cliente en notificaciones');
+  };
+  window.parse.onRegisterAsPushNotificationClientFailed = function() {
+    alert('Registro fallido');
+  };
+  
+  //subscribe callback
+  window.parse.onSubscribeToChannelSucceeded = function() {
+    alert('Suscrito a canal');
+  };
+  window.parse.onSubscribeToChannelFailed = function() {
+    alert('Suscrito fallido');
+  };  
+  //unsubscribe callback
+  window.parse.onUnsubscribeSucceeded = function() {
+    alert('Cancelada suscripción a canal');
+  };
+  window.parse.onUnsubscribeFailed = function() {
+    alert('Cancelada fallida');
+  };  
+//-------------------------------------------------------------------------------
+
   });
 })
 
