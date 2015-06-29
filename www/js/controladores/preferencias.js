@@ -27,7 +27,6 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
   };
 
   $scope.irEditarPerfil = function() {
-  	console.log("Va a editar perfil");
   	$state.go('editarPerfil');
   }
 
@@ -114,9 +113,7 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
 
 	// Función que identifica al usuario según nombre y contraseña
   	$scope.identificar = function() {
-  		console.log('Identificando', $scope.loginData);
-
-  		var email = $scope.loginData.username;
+  	var email = $scope.loginData.username;
 		var password = $scope.loginData.password;
 		var nombre;
 
@@ -159,7 +156,6 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
 				
 	   	        $scope.identifica();
 
-	    		console.log("Estado: " + correcto);
       			$scope.closeLogin();
 
    	    	},

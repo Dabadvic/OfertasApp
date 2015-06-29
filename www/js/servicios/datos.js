@@ -59,6 +59,7 @@ angular.module('servicio.datos', [])
         Con $ionicLoading muestra un mensaje de loading mientras se cargan los datos.
     */ 
     cargarDatos: function(usuarioId) {
+      var hoy = new Date();
       var OfertaObject = Parse.Object.extend("OfertaObject");
       var query = new Parse.Query(OfertaObject);
       ofertas = [];
@@ -84,6 +85,7 @@ angular.module('servicio.datos', [])
               var duracion = results[i].get("duracion");
               var usos = results[i].get("usos");
               
+              if(Date.parse(results[i].get("duracion")) > Date.parse(hoy))
                 ofertas.push({
                   nombre: user.get("local"),//results[i].get("local"),
                   descripcion_corta: results[i].get("descripcion_corta"),
@@ -96,7 +98,8 @@ angular.module('servicio.datos', [])
                     user.get("latitud"),user.get("longitud")
                     ),
                   latitud: user.get("latitud"),
-                  longitud: user.get("longitud")
+                  longitud: user.get("longitud"),
+                  id: results[i].id
                 });
             }
 
@@ -179,8 +182,35 @@ angular.module('servicio.datos', [])
           success: function(user) {
             ofer.set("usuario", user);
             ofer.save(null, {
-              success: function(gameScore) {
+              success: function(off) {
                 $ionicLoading.show({ template: 'Oferta creada', noBackdrop: true, duration: 2000 });
+              },
+              error: function(off, error) {
+                alert('Failed to create new object, with error code: ' + error.message);
+              }
+            });
+          },
+          error: function(object, error) {
+            
+          }
+      });
+    },
+    actualizarOferta: function(oferta) {
+      var OfertaObject = Parse.Object.extend("OfertaObject");
+      var query = new Parse.Query(OfertaObject);
+
+      console.log('Actualizando oferta');
+
+      query.get(oferta.id, {
+          success: function(ofer) {
+            ofer.set("descripcion", oferta.descripcion);
+            ofer.set("descripcion_corta", oferta.descripcion_corta);
+            ofer.set("duracion", oferta.duracion);
+            ofer.set("usos", oferta.usos);
+
+            ofer.save(null, {
+              success: function(gameScore) {
+                $ionicLoading.show({ template: 'Oferta actualizada', noBackdrop: true, duration: 2000 });
               },
               error: function(gameScore, error) {
                 alert('Failed to create new object, with error code: ' + error.message);

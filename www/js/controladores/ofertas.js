@@ -3,21 +3,25 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 .controller('controladorOfertas', function($scope, datos, $state, $localstorage, $ionicLoading) {
   $scope.ofertas = datos.getOfertas();
 
-  console.log("Carga main");
-
   $scope.$on('$ionicView.beforeEnter', function() {
 	$scope.nombre = $localstorage.get("user", "");
   })
 
   $scope.preferencias = function() {
-	console.log("Cambia vista a preferencias");
 	$state.go('preferencias');
   }
 
   $scope.recargarDatos = function() {
-  	console.log("Se van a recargar los datos");
   	datos.cargarDatos();
   	$scope.ofertas = datos.getOfertas();
+
+  	// Pruebas con notificaciones push
+  	Parse.Push.send({
+	  channels: [ "news" ],
+	  data: {
+	    alert: "Hello World!"
+	  }
+	},{});
   }
 
 })
@@ -31,6 +35,11 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 
 .controller('controladorDetalles', function($scope, oferta, $ionicModal, $compile, $ionicLoading) {
   $scope.oferta = oferta;
+
+  $scope.$on('$ionicView.beforeEnter', function() {
+    	$scope.textoCanjear = "Canjear";
+    	$scope.textoComoLlegar = "Como Llegar";
+  	})
 
   $scope.mapControl = {
   };
@@ -63,34 +72,57 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 
 })
 
-.controller('controladorPublicar', function($scope, datos, $localstorage, $ionicHistory) {
-	$scope.oferta = {};
-	$scope.titulo = "Publicar Oferta";
+.controller('controladorPublicar', function($scope, datos, oferta, $localstorage, $ionicHistory, $ionicLoading) {
+	if (oferta != undefined) {
+		$scope.oferta = {};
+		$scope.oferta.id = oferta.id;
+		$scope.oferta.descripcion = oferta.descripcion;
+		$scope.oferta.descripcion_corta = oferta.descripcion_corta;
+		$scope.oferta.duracion = new Date(oferta.duracion);
+		$scope.oferta.usos = oferta.usos;
+
+		$scope.titulo = "Editar oferta";
+	} else {
+		$scope.oferta = {};
+		$scope.titulo = "Publicar oferta";
+	}
 
 	$scope.publicar = function() {
-		datos.guardarOferta($scope.oferta, $localstorage.get("id", undefined));
+		if ($scope.oferta.id != undefined) {
+			datos.actualizarOferta($scope.oferta);
+			// Retroceder dos vistas
+			// get the right history stack based on the current view
+		    var historyId = $ionicHistory.currentHistoryId();
+		    var history = $ionicHistory.viewHistory().histories[historyId];
+		    // set the view 'depth' back in the stack as the back view
+		    var targetViewIndex = history.stack.length - 1 - 3;
+		    $ionicHistory.backView(history.stack[targetViewIndex]);
+		    // navigate to it
+		    $ionicHistory.goBack();
 
-		$ionicHistory.goBack();
-		
-		console.log($scope.oferta);
+		} else {
+			datos.guardarOferta($scope.oferta, $localstorage.get("id", undefined));
+			$ionicHistory.goBack();
+		}
 	}
 })
 
 
 .controller('controladorOfertasPublicadas', function($scope, datos, $localstorage, $ionicHistory, $ionicLoading) {
-	var OfertaObject = Parse.Object.extend("OfertaObject");
-    var query = new Parse.Query(OfertaObject);
-    var ofertas = [];
-    var hoy = new Date();
-    $scope.vigentes = [];
-    $scope.caducadas = [];
-    var usuarioId = $localstorage.get("id", undefined);
+	$scope.$on('$ionicView.beforeEnter', function() {
+		var OfertaObject = Parse.Object.extend("OfertaObject");
+	    var query = new Parse.Query(OfertaObject);
+	    var ofertas = [];
+	    var hoy = new Date();
+	    $scope.vigentes = [];
+	    $scope.caducadas = [];
+	    var usuarioId = $localstorage.get("id", undefined);
 
-    query.include("usuario");
+	    query.include("usuario");
 
-    $ionicLoading.show({
-        template: 'loading'
-    });
+	    $ionicLoading.show({
+	        template: 'loading'
+	    });
 
         query.find({  // Petición query
           success: function(results) {
@@ -103,7 +135,8 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
                   descripcion_corta: results[i].get("descripcion_corta"),
                   descripcion: results[i].get("descripcion"),
                   duracion: results[i].get("duracion"),
-                  usos: results[i].get("usos")
+                  usos: results[i].get("usos"),
+                  id: results[i].id
                 });
             }
           }
@@ -128,5 +161,26 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
             alert("No leo de la base de datos");
           }
         });
+	})
 })
+
+/* Controlador para los detalles de una pregunta que ya ha sido publicada.
+	
+	Antes de entrar cambia los nombres en el html
+ */
+.controller('controladorDetallesPublicada', function($scope, oferta, $state) {
+	$scope.oferta = oferta;
+
+	$scope.abreMapa = function() {
+		$state.go('publicarOferta', {oferta: JSON.stringify($scope.oferta)});
+	}
+
+	$scope.$on('$ionicView.beforeEnter', function() {
+    	document.getElementById("imagenCanjearOferta").className = "icon ion-camera";
+    	document.getElementById("imagenComoLlegarOferta").className = "icon ion-document-text";
+    	$scope.textoCanjear = "Escanear";
+    	$scope.textoComoLlegar = "Editar";
+  	})
+})
+
 ;

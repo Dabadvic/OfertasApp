@@ -60,9 +60,19 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Pre
 
   // Vista para publicar una oferta
   $stateProvider.state('publicarOferta', {
-    url: '/settings/publicaoferta',
+    url: '/settings/publicaoferta?oferta',
     templateUrl: 'templates/publicar_oferta.html',
-    controller: 'controladorPublicar'
+    controller: 'controladorPublicar',
+    resolve: {
+      oferta: function($stateParams) {
+        if ($stateParams.oferta) {
+          var obj = JSON.parse($stateParams.oferta);
+          return obj;
+        } else {
+          return undefined;
+        }
+      }
+    }
   })
 
   // Vista con el listado de ofertas publicadas por un usuario
@@ -74,17 +84,25 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Pre
 
 // Vista que lleva al detalle de una oferta concreta
   $stateProvider.state('detalle', {
-    url: '/:ofertaId:oferta',
+    url: '/:ofertaId',
     templateUrl: 'templates/oferta.html',
     controller: 'controladorDetalles',
     resolve: {
       oferta: function($stateParams, datos) {
-        if (!$stateParams.ofertaId) {
-          var obj = JSON.parse($stateParams.oferta);
-          console.log(obj);
-          return obj;
-        }
         return datos.getOferta($stateParams.ofertaId)
+      }
+    }
+  })
+
+// Vista con el detalle de una oferta publicada
+  $stateProvider.state('detallePublicada', {
+    url: '/:oferta',
+    templateUrl: 'templates/oferta.html',
+    controller: 'controladorDetallesPublicada',
+    resolve: {
+      oferta: function($stateParams) {
+        var obj = JSON.parse($stateParams.oferta);
+        return obj;
       }
     }
   })
