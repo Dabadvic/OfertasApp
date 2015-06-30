@@ -6,7 +6,6 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
   $scope.$on('$ionicView.beforeEnter', function() {
 	$scope.nombre = $localstorage.get("user", "");
 
-
 	if ($localstorage.get("notificaciones", true) == "true")
 		window.parse.subscribeToChannel('news');
 	else
