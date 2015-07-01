@@ -1,6 +1,6 @@
-/* Empty. Add your own CSS if you like */
 #nombreOferta {
 	position: absolute;
+	max-width: 35%;
 }
 
 #distanciaOferta {
@@ -12,6 +12,7 @@
 #descripcionOferta {
 	position: absolute;
 	font-weight: normal;
+	max-width: 30%;
 }
 
 #finOferta {
@@ -33,4 +34,12 @@ map {
 
 .scroll {
   height: 100%;
+}
+
+.item-complex .item-content, .item-radio .item-content {
+	padding: 16px 16px 16px 16px;
+}
+
+.item-body {
+	padding: 0px 16px 16px 16px;
 }

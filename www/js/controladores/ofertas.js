@@ -18,10 +18,11 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
   }
 
   $scope.recargarDatos = function() {
-  	//datos.cargarDatos();
-  	//$scope.ofertas = datos.getOfertas();
+  	console.log("Va a recargar los datos");
+  	datos.cargarDatos();
+  	$scope.ofertas = datos.getOfertas();
 
-
+/*
   	// Pruebas con notificaciones push
   	Parse.Push.send({
 	  channels: [ "news" ],
@@ -29,7 +30,7 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 	    alert: "Mandado desde pc"
 	  }
 	},{});
-
+*/
   }
 
 })
@@ -152,9 +153,13 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
           // Ordena ofertas por vigentes y caducadas
           for(var i = 0; i < ofertas.length; i++) {
           	var duracion = ofertas[i].duracion;
-          	ofertas[i].fin = duracion.getHours() + ":" + ((duracion.getMinutes().toString().length == 1) ? "0" + duracion.getMinutes() : duracion.getMinutes())
+          	if (duracion)
+          		ofertas[i].fin = duracion.getHours() + ":" + ((duracion.getMinutes().toString().length == 1) ? "0" + duracion.getMinutes() : duracion.getMinutes())
           					+ " " + duracion.getDate() + "/" + (duracion.getMonth()+1) + "/" + duracion.getFullYear();
-          	if(Date.parse(ofertas[i].duracion) < Date.parse(hoy)) {
+          	else
+          		ofertas[i].fin = "Marcada por usos";
+          	
+          	if(ofertas[i].duracion != undefined && Date.parse(ofertas[i].duracion) < Date.parse(hoy)) {
           		$scope.caducadas.push(ofertas[i]);
           	} else {
           		$scope.vigentes.push(ofertas[i]);

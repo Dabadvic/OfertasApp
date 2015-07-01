@@ -1,7 +1,7 @@
 <ion-view view-title="Listado">
 
   <ion-nav-title>
-    Listado de ofertas {{nombre}}
+    Listado {{nombre}}
   </ion-nav-title>
 
   <ion-nav-buttons side="right">
@@ -23,44 +23,6 @@
         </div>
         </ion-item>
       </ion-list>
-
-
-<script>
-var applicationId = "4R2V91bSep94FYqbspK1UkLIAL2Kd5IQJFCmZsMB";
-var clientKey = "BWlU4AtdgyJsSLklJTYN4nk9cWpQNeuXZPxbALtp";
-
-document.addEventListener("deviceready", function(){
-  //call registerAsPushNotificationClient internally
-  window.parse.setUp(applicationId, clientKey);
-  
-  //registerAsPushNotificationClient callback
-  window.parse.onRegisterAsPushNotificationClientSucceeded = function() {
-    alert('Registrado como cliente en notificaciones');
-  };
-  window.parse.onRegisterAsPushNotificationClientFailed = function() {
-    alert('Registro fallido como cliente en notificaciones');
-  };
-  
-  //subscribe callback
-  window.parse.onSubscribeToChannelSucceeded = function() {
-    alert('Suscrito a canal');
-  };
-  window.parse.onSubscribeToChannelFailed = function() {
-    alert('Suscrito a canal fallido');
-  };  
-  //unsubscribe callback
-  window.parse.onUnsubscribeSucceeded = function() {
-    alert('Cancelada suscripción a canal');
-  };
-  window.parse.onUnsubscribeFailed = function() {
-    alert('Cancelada suscripción a canal fallida');
-  };  
-}, false);
-
-//window.parse.subscribeToChannel('news');
-//window.parse.unsubscribe('news');
-</script>
-
 
     </ion-content>
   </ion-pane>

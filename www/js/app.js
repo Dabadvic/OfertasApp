@@ -48,7 +48,8 @@ var clientKey = "BWlU4AtdgyJsSLklJTYN4nk9cWpQNeuXZPxbALtp";
   
   //registerAsPushNotificationClient callback
   window.parse.onRegisterAsPushNotificationClientSucceeded = function() {
-    alert('Registrado como cliente en notificaciones');
+    //alert('Registrado como cliente en notificaciones');
+    console.log('Registrado como cliente en notificaciones');
   };
   window.parse.onRegisterAsPushNotificationClientFailed = function() {
     alert('Registro fallido');
@@ -56,14 +57,16 @@ var clientKey = "BWlU4AtdgyJsSLklJTYN4nk9cWpQNeuXZPxbALtp";
   
   //subscribe callback
   window.parse.onSubscribeToChannelSucceeded = function() {
-    alert('Suscrito a canal');
+    //alert('Suscrito a canal');
+    console.log('Suscrito a canal');
   };
   window.parse.onSubscribeToChannelFailed = function() {
     alert('Suscrito fallido');
   };  
   //unsubscribe callback
   window.parse.onUnsubscribeSucceeded = function() {
-    alert('Cancelada suscripción a canal');
+    //alert('Cancelada suscripción a canal');
+    console.log('Cancelada suscripción a canal');
   };
   window.parse.onUnsubscribeFailed = function() {
     alert('Cancelada fallida');

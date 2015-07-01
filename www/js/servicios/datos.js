@@ -34,7 +34,7 @@ angular.module('servicio.datos', [])
   function obtenerFin(duracion, usos) {
     var fin = "";
       if (usos != undefined) {
-        fin += "Restantes: " + usos;
+        fin += "Usos: " + usos;
       }
       if (duracion != undefined) {
         fin += " Hasta " + duracion.getHours() + ":" + ((duracion.getMinutes().toString().length == 1) ? "0" + duracion.getMinutes() : duracion.getMinutes());
@@ -85,7 +85,7 @@ angular.module('servicio.datos', [])
               var duracion = results[i].get("duracion");
               var usos = results[i].get("usos");
               
-              if(Date.parse(results[i].get("duracion")) > Date.parse(hoy))
+              if(Date.parse(duracion) > Date.parse(hoy) || ((usos > 0) && (duracion == undefined)))
                 ofertas.push({
                   nombre: user.get("local"),//results[i].get("local"),
                   descripcion_corta: results[i].get("descripcion_corta"),

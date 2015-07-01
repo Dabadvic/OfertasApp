@@ -12,10 +12,10 @@
       
       <ion-list>
         <ion-item ng-repeat="vigente in vigentes" ui-sref="detallePublicada({oferta: '{{vigente}}'})">
-        <div>
-          <p> <h2 id="nombreOferta">{{vigente.descripcion_corta}}</h2> <h3 id="distanciaOferta">Fecha de fin: {{vigente.fin}}</h3> <br>
+
+          <p> <h2 id="nombreOferta">{{vigente.descripcion_corta}}</h2> <h3 id="distanciaOferta">{{vigente.fin}}</h3> <br>
            <h3 id="descripcionOferta">{{vigente.descripcion}}</h3><h3 id="finOferta">Usos restantes: {{vigente.usos}}</h3></p>
-        </div>
+
         </ion-item>
       </ion-list>
       
@@ -26,7 +26,7 @@
       <ion-list>
         <ion-item ng-repeat="caducada in caducadas" ui-sref="detallePublicada({oferta: '{{caducada}}'})">
         <div>
-          <p> <h2 id="nombreOferta">{{caducada.descripcion_corta}}</h2> <h3 id="distanciaOferta">Fecha de fin: {{caducada.fin}}</h3> <br>
+          <p> <h2 id="nombreOferta">{{caducada.descripcion_corta}}</h2><h3 id="distanciaOferta">{{caducada.fin}}</h3> <br>
            <h3 id="descripcionOferta">{{caducada.descripcion}}</h3><h3 id="finOferta">Usos restantes: {{caducada.usos}}</h3></p>
         </div>
         </ion-item>
