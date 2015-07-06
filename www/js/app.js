@@ -1,8 +1,8 @@
 // Se indica el nombre del módulo y un array de los componentes que requiere
-angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Preferencias', 'controlador.Registro', 'controlador.editar'])
+angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Preferencias', 'controlador.Registro', 'controlador.editar', 'ngCordova'])
 
 // Este lo trae así por defecto
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $localstorage, $cordovaPush, $rootScope) {
 
   
 
@@ -18,29 +18,38 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Pre
 
     // Preparar Parse con la ID de la aplicación y la clave de JavaScript (ambas en la web)
     Parse.initialize("4R2V91bSep94FYqbspK1UkLIAL2Kd5IQJFCmZsMB", "aaHJB3mLTT2UmgaUyEvn2PQKBpO60WQDFqWNTodO");
-    /*
-    // Rest call to Parse to Insert/Update the Installation record for this Device
-                $http({
-                    url: "https://api.parse.com/1/installations",
-                    method: "POST",
-                    data: {"deviceType": "android",
-                           "installationId": CommonService.parseInstallationId,
-                           "gcmRegId": e.regid,
-                           "testdevice": tester,
-                           "channels": [""] },
-                    headers:  {"X-Parse-Application-Id": CommonService.parse_appkey,
-                               "X-Parse-REST-API-Key": CommonService.parse_restkey,
-                               "Content-Type": "application/json"}
-                }).success(function (data, status, headers, config) {
-                    LogService.add("GCM RegID: " + e.regid);
-                    LogService.add("GCM Parse InstallationID: " + CommonService.parseInstallationId);
-                        //alert('GCM registered success = ' + data + ' Status ' + status); 
-                }).error(function (data, status, headers, config) {
-                        //alert('GCM registered failure = ' + data + ' Status ' + status);
-                });
-*/
+
+      // Inicializar el plugin para notificaciones push
+        ParsePushPlugin.register({}, 
+        function() {
+            console.log('successfully registered device!');
+            $localstorage.set("registrado", true);
+            
+            ParsePushPlugin.getInstallationId(function(id) {
+                console.log(id);
+            }, function(e) {
+                alert('error');
+            });
+            
+            ParsePushPlugin.getSubscriptions(function(subscriptions) {
+                console.log(subscriptions);
+            }, function(e) {
+                alert('error');
+            });
+            
+            ParsePushPlugin.subscribe('news', function(msg) {
+                console.log('Suscrito a news');
+            }, function(e) {
+                alert('error');
+            });
+
+        }, function(e) {
+            alert('error registering device: ' + e);
+        });
+
 
 //-------------------------------------------------------------------------------
+/*
 var applicationId = "4R2V91bSep94FYqbspK1UkLIAL2Kd5IQJFCmZsMB";
 var clientKey = "BWlU4AtdgyJsSLklJTYN4nk9cWpQNeuXZPxbALtp";
 //call registerAsPushNotificationClient internally
@@ -71,6 +80,7 @@ var clientKey = "BWlU4AtdgyJsSLklJTYN4nk9cWpQNeuXZPxbALtp";
   window.parse.onUnsubscribeFailed = function() {
     alert('Cancelada fallida');
   };  
+  */
 //-------------------------------------------------------------------------------
 
   });

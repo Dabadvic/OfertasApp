@@ -13,10 +13,6 @@
       
       <ion-checkbox ng-model="recibirNotificaciones.checked" ng-change="notificaciones()">Recibir notificaciones</ion-checkbox>
 
-      <label class="item">Value1
-        <input type="checkbox" ng-model="checkboxModel.value1">
-      </label>
-
       <label class="item item-input">
         <span class="input-label">Distancia (metros)</span>
         <input type="number" value="1000"> 
@@ -41,7 +37,7 @@
         {{loginData.identificado}}
       </ion-item>
 
-      <ion-item id="botonEditar" ng-click="irEditarPerfil()">
+      <ion-item id="botonEditar" ui-sref="editarPerfil">
         Editar perfil
       </ion-item>
 
@@ -53,6 +49,10 @@
       <ion-item id="botonOfertasPublicadas" class="item-icon-left" ui-sref="ofertasPersonales">
         Ofertas publicadas
         <i class="icon ion-ios-paper" style="font-size: 32px; color: #387EF5"></i>
+      </ion-item>
+
+      <ion-item ng-click="borrarDatos()">
+        Borrar datos locales
       </ion-item>
 
     </ion-content>

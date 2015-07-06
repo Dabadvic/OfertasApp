@@ -62,6 +62,10 @@ angular.module('servicio.datos', [])
       var hoy = new Date();
       var OfertaObject = Parse.Object.extend("OfertaObject");
       var query = new Parse.Query(OfertaObject);
+
+      $ionicLoading.show({
+          template: 'loading'
+        });
       ofertas = [];
 
       query.include("usuario");
@@ -72,12 +76,10 @@ angular.module('servicio.datos', [])
         userLat = pos.coords.latitude; 
         userLon = pos.coords.longitude;
 
-        $ionicLoading.show({
-          template: 'loading'
-        });
 
         query.find({  // Petición query
           success: function(results) {
+            
             // Por cada elemento devuelto, se guarda en ofertas
             for(var i=0; i < results.length; i++) {
               var user = results[i].get("usuario");
@@ -184,6 +186,15 @@ angular.module('servicio.datos', [])
             ofer.save(null, {
               success: function(off) {
                 $ionicLoading.show({ template: 'Oferta creada', noBackdrop: true, duration: 2000 });
+                
+                // Pruebas con notificaciones push
+                    Parse.Push.send({
+                    channels: [ "news" ],
+                    data: {
+                      alert: "Nueva oferta: " + oferta.descripcion_corta,
+                      otros: "otros"
+                    }
+                  },{});
               },
               error: function(off, error) {
                 alert('Failed to create new object, with error code: ' + error.message);
@@ -216,6 +227,22 @@ angular.module('servicio.datos', [])
                 alert('Failed to create new object, with error code: ' + error.message);
               }
             });
+          },
+          error: function(object, error) {
+            
+          }
+      });
+    },
+    borrarOferta: function(oferta) {
+      var OfertaObject = Parse.Object.extend("OfertaObject");
+      var query = new Parse.Query(OfertaObject);
+
+      console.log('Borrando oferta');
+
+      query.get(oferta.id, {
+          success: function(ofer) {
+            ofer.destroy({});
+            $ionicLoading.show({ template: 'Oferta borrada', noBackdrop: true, duration: 2000 });
           },
           error: function(object, error) {
             

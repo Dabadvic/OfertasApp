@@ -16,6 +16,11 @@
           <p> <h2 id="nombreOferta">{{vigente.descripcion_corta}}</h2> <h3 id="distanciaOferta">{{vigente.fin}}</h3> <br>
            <h3 id="descripcionOferta">{{vigente.descripcion}}</h3><h3 id="finOferta">Usos restantes: {{vigente.usos}}</h3></p>
 
+           <ion-option-button class="button-assertive"
+                               ng-click="borrar({{vigente}})">
+              Borrar
+            </ion-option-button>
+
         </ion-item>
       </ion-list>
       
@@ -29,6 +34,12 @@
           <p> <h2 id="nombreOferta">{{caducada.descripcion_corta}}</h2><h3 id="distanciaOferta">{{caducada.fin}}</h3> <br>
            <h3 id="descripcionOferta">{{caducada.descripcion}}</h3><h3 id="finOferta">Usos restantes: {{caducada.usos}}</h3></p>
         </div>
+
+        <ion-option-button class="button-assertive"
+                           ng-click="borrar({{caducada}})">
+          Borrar
+        </ion-option-button>
+
         </ion-item>
       </ion-list>
 

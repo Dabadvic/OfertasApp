@@ -1,15 +1,30 @@
-angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'ionic'])
+angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'ionic', 'ngCordova'])
 
-.controller('controladorOfertas', function($scope, datos, $state, $localstorage, $ionicLoading) {
+.controller('controladorOfertas', function($scope, datos, $state, $localstorage, $ionicLoading, $cordovaPush, $rootScope) {
   $scope.ofertas = datos.getOfertas();
 
   $scope.$on('$ionicView.beforeEnter', function() {
 	$scope.nombre = $localstorage.get("user", "");
 
+	
+	if(window.ParsePushPlugin){
+        console.log("Hay ParsePushPlugin");
+
+        ParsePushPlugin.on('openPN', function(pn){
+		    alert("Notificacion abierta");
+		});
+
+		ParsePushPlugin.on('receivePN', function(pn){
+		    console.log('yo i got this push notification:' + JSON.stringify(pn));
+		});
+    }
+
+/*
 	if ($localstorage.get("notificaciones", true) == "true")
 		window.parse.subscribeToChannel('news');
 	else
 		window.parse.unsubscribe('news');
+*/
 
   })
 
@@ -31,6 +46,7 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 	  }
 	},{});
 */
+
   }
 
 })
@@ -117,7 +133,23 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 })
 
 
-.controller('controladorOfertasPublicadas', function($scope, datos, $localstorage, $ionicHistory, $ionicLoading) {
+.controller('controladorOfertasPublicadas', function($scope, datos, $localstorage, $ionicHistory, $ionicLoading, $ionicPopup) {
+	$scope.borrar = function(oferta) {
+		var confirmPopup = $ionicPopup.confirm({
+		    title: 'Borrar oferta',
+		    template: '¿Estás seguro de que quieres borrar la oferta?'
+		});
+		confirmPopup.then(function(res) {
+		    if(res) {
+		    	datos.borrarOferta(oferta);
+		    	$ionicHistory.goBack();
+		    } else {
+		    	console.log('No borrando');
+		    }
+		});
+		
+	}
+
 	$scope.$on('$ionicView.beforeEnter', function() {
 		var OfertaObject = Parse.Object.extend("OfertaObject");
 	    var query = new Parse.Query(OfertaObject);

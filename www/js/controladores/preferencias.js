@@ -31,8 +31,8 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
     $localstorage.set("notificaciones", $scope.recibirNotificaciones.checked);
   };
 
-  $scope.irEditarPerfil = function() {
-  	$state.go('editarPerfil');
+  $scope.borrarDatos = function() {
+  	$localstorage.clear();
   }
 
   //----------------------------------------------------Login-------------------------------------------------------------------------
