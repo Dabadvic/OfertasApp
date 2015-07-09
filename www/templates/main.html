@@ -16,9 +16,9 @@
   <ion-pane>    
     <ion-content>
       <ion-list>
-        <ion-item ng-repeat="oferta in ofertas" ui-sref="detalle({ofertaId: $index})">
+        <ion-item ng-repeat="oferta in ofertas" ui-sref="detalle({oferta: '{{oferta}}' })">
         <div>
-          <p> <h2 id="nombreOferta">{{oferta.nombre}}</h2> <h3 id="distanciaOferta">{{oferta.distancia}} m</h3> <br>
+          <p> <h2 id="nombreOfertaMain">{{decode(oferta.nombre)}}</h2> <h3 id="distanciaOferta">{{oferta.distancia}} m</h3> <br>
            <h3 id="descripcionOferta">{{oferta.descripcion_corta}}</h3>  <h3 id="finOferta">{{oferta.fin}}</h3></p>
         </div>
         </ion-item>

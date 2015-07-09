@@ -4,8 +4,6 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Pre
 // Este lo trae así por defecto
 .run(function($ionicPlatform, $localstorage, $cordovaPush, $rootScope) {
 
-  
-
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -20,27 +18,100 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Pre
     Parse.initialize("4R2V91bSep94FYqbspK1UkLIAL2Kd5IQJFCmZsMB", "aaHJB3mLTT2UmgaUyEvn2PQKBpO60WQDFqWNTodO");
 
       // Inicializar el plugin para notificaciones push
-        ParsePushPlugin.register({}, 
+      window.onNotification = function(e) {
+        console.log(e);
+        switch( e.event )
+          {
+          case 'registered':
+              if ( e.regid.length > 0 )
+              {
+                  // Your GCM push server needs to know the regID before it can push to this device
+                  // here is where you might want to send it the regID for later use.
+                  console.log("regID = " + e.regid);
+              }
+          break;
+
+          case 'message':
+              // if this flag is set, this notification happened while we were in the foreground.
+              // you might want to play a sound to get the user's attention, throw up a dialog, etc.
+              if ( e.foreground )
+              {
+                console.log("Inline");
+              }
+              else
+              {  // otherwise we were launched because the user touched a notification in the notification tray.
+                  if ( e.coldstart )
+                  {
+                    alert("Coldstart");
+                  }
+                  else
+                  {
+                    alert("Background");
+                  }
+              }
+
+              console.log(e.payload.message);
+          break;
+
+          case 'error':
+              console.log("Error indefinido");
+          break;
+
+          default:
+              console.log("Default");
+          break;
+        }
+      }
+
+      // result contains any message sent from the plugin call
+      function successHandler (result) {
+          console.log('result = ' + result);
+      }
+
+      // result contains any error description text returned from the plugin call
+      function errorHandler (error) {
+          console.log('error = ' + error);
+      }
+/*
+      var pushNotification;
+      document.addEventListener("deviceready", function(){
+        pushNotification = window.plugins.pushNotification;
+        pushNotification.register(
+        successHandler,
+        errorHandler,
+        {
+            "senderID":"792773052245",
+            "ecb":"onNotification"
+        });
+      });
+*/
+
+        window.ParsePushPlugin.register({}, 
         function() {
             console.log('successfully registered device!');
             $localstorage.set("registrado", true);
             
-            ParsePushPlugin.getInstallationId(function(id) {
+            window.ParsePushPlugin.getInstallationId(function(id) {
                 console.log(id);
             }, function(e) {
                 alert('error');
             });
             
-            ParsePushPlugin.getSubscriptions(function(subscriptions) {
+            window.ParsePushPlugin.getSubscriptions(function(subscriptions) {
                 console.log(subscriptions);
             }, function(e) {
                 alert('error');
             });
             
-            ParsePushPlugin.subscribe('news', function(msg) {
+            window.ParsePushPlugin.subscribe('news', function(msg) {
                 console.log('Suscrito a news');
             }, function(e) {
                 alert('error');
+            });
+
+            window.ParsePushPlugin.on('receivePN', function(pn){
+              console.log('Recibida notificacion');
+              console.log(pn);
             });
 
         }, function(e) {
@@ -92,9 +163,20 @@ var clientKey = "BWlU4AtdgyJsSLklJTYN4nk9cWpQNeuXZPxbALtp";
 
 // Vista principal, que es la que se carga si no hay nada (especificado en el otherwise)
   $stateProvider.state('ofertas', {
-    url: '/',
+    url: '/:oferta',
     templateUrl: 'templates/main.html',
-    controller: 'controladorOfertas'
+    controller: 'controladorOfertas',
+    resolve: {
+      oferta: function($stateParams) {
+        if ($stateParams.oferta) {
+          console.log("Iniciando con oferta");
+          var obj = JSON.parse($stateParams.oferta);
+          return obj;
+        } else {
+          return undefined;
+        }
+      }
+    }
   })
 
 // Vista con las preferencias de usuario
@@ -151,12 +233,15 @@ var clientKey = "BWlU4AtdgyJsSLklJTYN4nk9cWpQNeuXZPxbALtp";
 
 // Vista que lleva al detalle de una oferta concreta
   $stateProvider.state('detalle', {
-    url: '/:ofertaId',
+    url: '/:oferta',
     templateUrl: 'templates/oferta.html',
     controller: 'controladorDetalles',
     resolve: {
-      oferta: function($stateParams, datos) {
-        return datos.getOferta($stateParams.ofertaId)
+      oferta: function($stateParams) {
+        //return datos.getOferta($stateParams.ofertaId)
+        console.log($stateParams.oferta);
+        var obj = JSON.parse($stateParams.oferta);
+        return obj;
       }
     }
   })
@@ -173,4 +258,5 @@ var clientKey = "BWlU4AtdgyJsSLklJTYN4nk9cWpQNeuXZPxbALtp";
       }
     }
   })
+
 });

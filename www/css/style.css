@@ -3,6 +3,11 @@
 	max-width: 35%;
 }
 
+#nombreOfertaMain {
+	position: absolute;
+	max-width: 65%;
+}
+
 #distanciaOferta {
 	text-align: right; 
 	position: relative;

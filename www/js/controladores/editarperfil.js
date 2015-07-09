@@ -31,7 +31,7 @@ angular.module('controlador.editar', ['servicio.datos', 'servicio.mapas'])
 	   	    	$scope.loginData.email = usuario.get("email");
 				$scope.loginData.nombre = usuario.get("nombre");
 				$scope.loginData.apellidos = usuario.get("apellidos");
-				$scope.loginData.local = usuario.get("local");
+				$scope.loginData.local = decodeURIComponent(usuario.get("local"));
 
 				$scope.localizacion = {};
 				$scope.localizacion.latitud = usuario.get("latitud");
@@ -52,7 +52,7 @@ angular.module('controlador.editar', ['servicio.datos', 'servicio.mapas'])
    		var email = $scope.loginData.email;
 		var nombre = $scope.loginData.nombre;
 		var apellidos = $scope.loginData.apellidos;
-		var local = $scope.loginData.local;
+		var local = encodeURIComponent($scope.loginData.local).replace(/[!'()*]/g, escape);
 		if ($scope.loginData.password) {
 			console.log("Cambiamos el password");
 			if ($scope.loginData.password != $scope.loginData.repassword) {

@@ -43,6 +43,11 @@ angular.module('servicio.datos', [])
       return fin;
   }
 
+  /* Función que escapa caracteres especiales */
+  function rfc3986EncodeURIComponent(str) {
+    return encodeURIComponent(str).replace(/[!'()*]/g, escape);
+  }
+
   return {
     getOfertas: function() {
       return ofertas;
@@ -143,12 +148,12 @@ angular.module('servicio.datos', [])
 
               console.log('Registrando usuario: ', usuario.nombre);
               var user = new UserObject();
-              
+              console.log(rfc3986EncodeURIComponent(usuario.local));
               user.set("nombre", usuario.nombre);
               user.set("password", usuario.password);
               user.set("apellidos", usuario.apellidos);
               user.set("email", usuario.email);
-              user.set("local", usuario.local);
+              user.set("local", rfc3986EncodeURIComponent(usuario.local));
               user.set("latitud", usuario.localizacion.latitud);
               user.set("longitud", usuario.localizacion.longitud);
 
@@ -170,7 +175,7 @@ angular.module('servicio.datos', [])
     guardarOferta: function(oferta, usuario) {
       var OfertaObject = Parse.Object.extend("OfertaObject");
 
-      console.log('Registrando oferta: ', usuario.nombre);
+      console.log('Registrando oferta: ', usuario);
       var ofer = new OfertaObject();
               
       ofer.set("descripcion", oferta.descripcion);
@@ -187,12 +192,27 @@ angular.module('servicio.datos', [])
               success: function(off) {
                 $ionicLoading.show({ template: 'Oferta creada', noBackdrop: true, duration: 2000 });
                 
+                var mensaje = {
+                  nombre: user.get("local"),
+                  descripcion_corta: oferta.descripcion_corta,
+                  descripcion: oferta.descripcion,
+                  fin: obtenerFin(oferta.duracion, oferta.usos),
+                  duracion: oferta.duracion,
+                  usos: oferta.usos,
+                  //"distancia":819,
+                  latitud: user.get("latitud"),
+                  longitud: user.get("longitud"),
+                  id: user.id
+                };
+
                 // Pruebas con notificaciones push
                     Parse.Push.send({
                     channels: [ "news" ],
+                    message: "Mensaje",
+                    msgcnt: "1",
                     data: {
                       alert: "Nueva oferta: " + oferta.descripcion_corta,
-                      otros: "otros"
+                      oferta: JSON.stringify(mensaje)
                     }
                   },{});
               },

@@ -1,23 +1,36 @@
 angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'ionic', 'ngCordova'])
 
-.controller('controladorOfertas', function($scope, datos, $state, $localstorage, $ionicLoading, $cordovaPush, $rootScope) {
+.controller('controladorOfertas', function($scope, oferta, datos, $state, $localstorage, $ionicLoading, $cordovaPush, $rootScope) {
+  
+  $scope.$on('$ionicView.beforeEnter', function() {
+    	if (oferta != undefined) {
+		  	console.log("Cambiando a oferta");
+		  	$state.go('detalle', {oferta: JSON.stringify(oferta)});
+		  	oferta = undefined;
+		} else {
+			console.log("No hay oferta");
+		}
+  	})
+
   $scope.ofertas = datos.getOfertas();
+
+  $scope.decode = function(str){
+  	return decodeURIComponent(str);
+  }
 
   $scope.$on('$ionicView.beforeEnter', function() {
 	$scope.nombre = $localstorage.get("user", "");
 
-	
-	if(window.ParsePushPlugin){
-        console.log("Hay ParsePushPlugin");
+/*
+		if(window.ParsePushPlugin){
+            console.log("Hay ParsePushPlugin");
 
-        ParsePushPlugin.on('openPN', function(pn){
-		    alert("Notificacion abierta");
-		});
-
-		ParsePushPlugin.on('receivePN', function(pn){
-		    console.log('yo i got this push notification:' + JSON.stringify(pn));
-		});
-    }
+          ParsePushPlugin.on('receivePN', function(pn){
+              console.log('Recibida notificacion' + JSON.stringify(pn));
+              console.log(pn);
+          });
+        }
+*/
 
 /*
 	if ($localstorage.get("notificaciones", true) == "true")
@@ -36,18 +49,9 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
   	console.log("Va a recargar los datos");
   	datos.cargarDatos();
   	$scope.ofertas = datos.getOfertas();
-
-/*
-  	// Pruebas con notificaciones push
-  	Parse.Push.send({
-	  channels: [ "news" ],
-	  data: {
-	    alert: "Mandado desde pc"
-	  }
-	},{});
-*/
-
   }
+
+  $scope.recargarDatos();
 
 })
 
@@ -61,13 +65,15 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 .controller('controladorDetalles', function($scope, oferta, $ionicModal, $compile, $ionicLoading) {
   $scope.oferta = oferta;
 
+  $scope.nombreEs = decodeURIComponent(oferta.nombre);
+
   $scope.$on('$ionicView.beforeEnter', function() {
     	$scope.textoCanjear = "Canjear";
     	$scope.textoComoLlegar = "Como Llegar";
+    	document.getElementById("botonBorrarOferta").style.display='none';
   	})
 
-  $scope.mapControl = {
-  };
+  $scope.mapControl = {};
 
   // Crear la ventana modal que usaremos para el mapa
   $ionicModal.fromTemplateUrl('templates/mapa_modal.html', {
@@ -213,8 +219,31 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 	
 	Antes de entrar cambia los nombres en el html
  */
-.controller('controladorDetallesPublicada', function($scope, oferta, $state) {
+.controller('controladorDetallesPublicada', function($scope, oferta, $state, datos, $ionicPopup, $ionicHistory) {
 	$scope.oferta = oferta;
+
+	$scope.borrarOferta = function(oferta) {
+		var confirmPopup = $ionicPopup.confirm({
+		    title: 'Borrar oferta',
+		    template: '¿Estás seguro de que quieres borrar la oferta?'
+		});
+		confirmPopup.then(function(res) {
+		    if(res) {
+		    	// Retroceder dos vistas
+				// get the right history stack based on the current view
+			    var historyId = $ionicHistory.currentHistoryId();
+			    var history = $ionicHistory.viewHistory().histories[historyId];
+			    // set the view 'depth' back in the stack as the back view
+			    var targetViewIndex = history.stack.length - 1 - 2;
+			    $ionicHistory.backView(history.stack[targetViewIndex]);
+			    // navigate to it
+			    $ionicHistory.goBack();
+			   	datos.borrarOferta(oferta);
+		    } else {
+		    	console.log('No borrando');
+		    }
+		});
+	}
 
 	$scope.abreMapa = function() {
 		$state.go('publicarOferta', {oferta: JSON.stringify($scope.oferta)});
@@ -225,6 +254,7 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
     	document.getElementById("imagenComoLlegarOferta").className = "icon ion-document-text";
     	$scope.textoCanjear = "Escanear";
     	$scope.textoComoLlegar = "Editar";
+    	$scope.textoBorrar = "Borrar";
   	})
 })
 
