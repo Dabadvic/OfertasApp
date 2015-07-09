@@ -114,6 +114,15 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Pre
               console.log(pn);
             });
 
+            var ultimaPosicion = $localstorage.getObject("ultimaPosicionConocida");
+            if (ultimaPosicion.latitud != undefined) {
+              window.ParsePushPlugin.setLocation(ultimaPosicion.latitud, ultimaPosicion.longitud, function(msg){
+                  console.log('Ubicación establecida');
+              }, function(e) {
+                  console.log('Error en setLocation: ' + e);
+              });
+            }
+
         }, function(e) {
             alert('error registering device: ' + e);
         });

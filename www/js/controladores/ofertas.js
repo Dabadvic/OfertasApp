@@ -1,6 +1,6 @@
 angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'ionic', 'ngCordova'])
 
-.controller('controladorOfertas', function($scope, oferta, datos, $state, $localstorage, $ionicLoading, $cordovaPush, $rootScope) {
+.controller('controladorOfertas', function($scope, oferta, datos, $state, $localstorage, $ionicLoading, $cordovaPush, $rootScope, $timeout, $ionicPopup) {
   
   $scope.$on('$ionicView.beforeEnter', function() {
     	if (oferta != undefined) {
@@ -10,6 +10,15 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 		} else {
 			console.log("No hay oferta");
 		}
+
+		$scope.nombre = $localstorage.get("user", "");
+
+/*
+	if ($localstorage.get("notificaciones", true) == "true")
+		window.parse.subscribeToChannel('news');
+	else
+		window.parse.unsubscribe('news');
+*/
   	})
 
   $scope.ofertas = datos.getOfertas();
@@ -18,41 +27,66 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
   	return decodeURIComponent(str);
   }
 
-  $scope.$on('$ionicView.beforeEnter', function() {
-	$scope.nombre = $localstorage.get("user", "");
-
-/*
-		if(window.ParsePushPlugin){
-            console.log("Hay ParsePushPlugin");
-
-          ParsePushPlugin.on('receivePN', function(pn){
-              console.log('Recibida notificacion' + JSON.stringify(pn));
-              console.log(pn);
-          });
-        }
-*/
-
-/*
-	if ($localstorage.get("notificaciones", true) == "true")
-		window.parse.subscribeToChannel('news');
-	else
-		window.parse.unsubscribe('news');
-*/
-
-  })
-
   $scope.preferencias = function() {
 	$state.go('preferencias');
   }
 
   $scope.recargarDatos = function() {
+  	compruebaGPS();
   	console.log("Va a recargar los datos");
   	datos.cargarDatos();
   	$scope.ofertas = datos.getOfertas();
   }
 
-  $scope.recargarDatos();
+function compruebaGPS() {
+ // Avisar al usuario de que tiene el GPS desactivado
+  	var gpsStatus = "NO";
+	navigator.geolocation.getCurrentPosition(function(pos){
+		var ultimaPosicion = {latitud: pos.coords.latitude, longitud: pos.coords.longitude};
+		$localstorage.setObject("ultimaPosicionConocida", ultimaPosicion);
+	    gpsStatus = "OK";
 
+	    if (window.ParsePushPlugin) {
+	    	window.ParsePushPlugin.setLocation(ultimaPosicion.latitud, ultimaPosicion.longitud, function(msg){
+                  console.log('Ubicación establecida');
+              }, function(e) {
+                  console.log('Error en setLocation: ' + e);
+              });
+	    }
+	});
+
+	$timeout(function(){
+	    if(gpsStatus == "OK")
+	    	console.log("Estado del GPS: " + gpsStatus)
+	    else
+	    	var alertPopup = $ionicPopup.alert({
+				title: 'GPS inactivo',
+				template: 'Es posible que el GPS esté desactivado o haya sido recientemente activado, por favor, actívelo y espere unos segundos. Gracias.'
+			});
+	}, 1500);
+}
+
+compruebaGPS();
+  //$scope.recargarDatos();
+
+/*
+// Pruebas geopoints
+var point = new Parse.GeoPoint(32.0, -20.0);
+console.log("Geopunto: "); console.log(point);
+console.log("Geopunto to JSON: "); console.log(point.toJSON());
+
+var LocationObject = Parse.Object.extend("LocationObject");
+var location = new LocationObject();
+//location.set("location", point);
+//location.set("location", point.toJSON());
+//location.save(null, {});
+
+window.ParsePushPlugin.setLocation(point.toJSON(), function(msg){
+                console.log('Ubicación establecida');
+            }, function(e) {
+                console.log('Error en setLocation: ' + e);
+            });
+*/
 })
 
 .controller('controladorBarra', function ($scope, $ionicHistory) {
@@ -71,7 +105,7 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
     	$scope.textoCanjear = "Canjear";
     	$scope.textoComoLlegar = "Como Llegar";
     	document.getElementById("botonBorrarOferta").style.display='none';
-  	})
+  	});
 
   $scope.mapControl = {};
 

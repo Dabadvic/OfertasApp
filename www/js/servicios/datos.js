@@ -68,9 +68,6 @@ angular.module('servicio.datos', [])
       var OfertaObject = Parse.Object.extend("OfertaObject");
       var query = new Parse.Query(OfertaObject);
 
-      $ionicLoading.show({
-          template: 'loading'
-        });
       ofertas = [];
 
       query.include("usuario");
@@ -81,6 +78,9 @@ angular.module('servicio.datos', [])
         userLat = pos.coords.latitude; 
         userLon = pos.coords.longitude;
 
+        $ionicLoading.show({
+          template: 'loading'
+        });
 
         query.find({  // Petición query
           success: function(results) {
@@ -205,16 +205,26 @@ angular.module('servicio.datos', [])
                   id: user.id
                 };
 
+                  var pushQuery = new Parse.Query(Parse.Installation);
+                  var punto = new Parse.GeoPoint(parseFloat(mensaje.latitud), parseFloat(mensaje.longitud));
+                  pushQuery.withinKilometers("location", punto, 2);
                 // Pruebas con notificaciones push
                     Parse.Push.send({
-                    channels: [ "news" ],
-                    message: "Mensaje",
-                    msgcnt: "1",
-                    data: {
-                      alert: "Nueva oferta: " + oferta.descripcion_corta,
-                      oferta: JSON.stringify(mensaje)
-                    }
-                  },{});
+                      where: pushQuery,
+                      data: {
+                        alert: "Nueva oferta: " + oferta.descripcion_corta,
+                        oferta: JSON.stringify(mensaje)
+                      }
+                    }, {
+                      success: function() {
+                        // Push was successful
+                        console.log("Oferta enviada");
+                      },
+                      error: function(error) {
+                        // Handle error
+                        console.log(error);
+                      }
+                    });
               },
               error: function(off, error) {
                 alert('Failed to create new object, with error code: ' + error.message);
