@@ -1,0 +1,5 @@
+adb logcat mio:V *:S
+
+
+pn buscar
+Asian top left: Shu Qi big bood blonde centre 2nd row: Stassi Schroeder blonde right 2nd row: Cameron Diaz black haired left 3rd row: Kim Kardashian black haired right 3rd row: Sibel Kekilli blonde left 4th row : leighton meester 4th row right: Tila Tequila 5th row right: Marilyn Monroe 6th row centre: Sasha Grey 6th row right: Chelsea Reeves

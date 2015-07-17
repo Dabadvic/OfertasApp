@@ -13,17 +13,18 @@
       
       <ion-checkbox ng-model="recibirNotificaciones.checked" ng-change="notificaciones()">Recibir notificaciones</ion-checkbox>
 
-      <label class="item item-input">
-        <span class="input-label">Distancia (metros)</span>
-        <input type="number" value="1000"> 
-      </label>
+      <ion-item class="item item-input">
+        <div class="input-label">Distancia ofertas (metros)</div>
+        <input type="tel" value="1000"> 
+      </ion-item>
 
       <div class="item item-divider"> 
         Aplicación
       </div>
 
-      <label class="item item-input">
-        <span class="input-label">Idioma</span>
+      <ion-item class="item-icon-left">
+        <i class="icon ion-earth" style="font-size: 32px; color: #387EF5"></i>
+        Idioma
         <select>
           <option value="es">Español</option>
           <option value="en">English</option>
@@ -31,19 +32,21 @@
           <option value="fr">Français</option>
           <option value="su">Suomi</option>
         </select>
-      </label>
-
-      <ion-item ng-click="login()">
-        {{loginData.identificado}}
       </ion-item>
 
-      <ion-item id="botonEditar" ui-sref="editarPerfil">
+      <ion-item id="botonIdentificar" class="item-icon-left" ng-click="login()">
+        {{loginData.identificado}}
+        <i id="imagenBotonEditar" class="icon ion-log-out" style="font-size: 32px; color: #387EF5"></i>
+      </ion-item>
+
+      <ion-item id="botonEditar" class="item-icon-left" ui-sref="editarPerfil">
         Editar perfil
+        <i class="icon ion-edit" style="font-size: 32px; color: #387EF5"></i>
       </ion-item>
 
       <ion-item id="botonPublicar" class="item-icon-left" ui-sref="publicarOferta">
         Publicar oferta
-        <i class="icon ion-edit" style="font-size: 32px; color: #387EF5"></i>
+        <i class="icon ion-android-upload" style="font-size: 32px; color: #387EF5"></i>
       </ion-item>
 
       <ion-item id="botonOfertasPublicadas" class="item-icon-left" ui-sref="ofertasPersonales">
@@ -51,8 +54,14 @@
         <i class="icon ion-ios-paper" style="font-size: 32px; color: #387EF5"></i>
       </ion-item>
 
-      <ion-item ng-click="borrarDatos()">
+      <ion-item id="botonAmpliarCuenta" class="item-icon-left" ng-click="">
+        Ampliar cuenta
+        <i class="icon ion-ios-pulse-strong" style="font-size: 32px; color: #387EF5"></i>
+      </ion-item>
+
+      <ion-item ng-click="borrarDatos()" class="item-icon-left">
         Borrar datos locales
+        <i class="icon ion-trash-a" style="font-size: 32px; color: #387EF5"></i>
       </ion-item>
 
     </ion-content>

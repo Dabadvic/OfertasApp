@@ -5,14 +5,16 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
   $scope.identifica = function() {
   	if($localstorage.get("identificado", false)) {
 	    $scope.loginData.identificado = "Bienvenido, " + $localstorage.get("user", "") + ". Desconectarse";
-	    document.getElementById("botonEditar").style.visibility = "visible";
-      document.getElementById("botonPublicar").style.visibility = "visible";
-      document.getElementById("botonOfertasPublicadas").style.visibility = "visible";
+	    document.getElementById("botonEditar").style.display='inherit';
+      document.getElementById("botonPublicar").style.display='inherit';
+      document.getElementById("botonOfertasPublicadas").style.display='inherit';
+      document.getElementById("imagenBotonEditar").className="icon ion-log-out";
     } else {
 	    $scope.loginData.identificado = "¿Eres dueño de un negocio? Identifícate";
-	    document.getElementById("botonEditar").style.visibility = "hidden";
-      document.getElementById("botonPublicar").style.visibility = "hidden";
-      document.getElementById("botonOfertasPublicadas").style.visibility = "hidden";
+	    document.getElementById("botonEditar").style.display='none';
+      document.getElementById("botonPublicar").style.display='none';
+      document.getElementById("botonOfertasPublicadas").style.display='none';
+      document.getElementById("imagenBotonEditar").className="icon ion-log-in";
     }
   }
 

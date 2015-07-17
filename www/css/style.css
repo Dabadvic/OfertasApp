@@ -48,3 +48,20 @@ map {
 .item-body {
 	padding: 0px 16px 16px 16px;
 }
+
+.item-select select {
+  padding: 14px 48px 8px 16px;
+}
+
+[nav-bar-transition="ios"] [nav-bar="active"] .bar, [nav-bar-transition="ios"] [nav-bar="entering"] .bar {
+	/*background-color: #0099FF; */
+}
+
+/*
+.item-complex .item-content, .item-radio .item-content {
+	background: rgba(102, 255, 255, 0.4);
+}
+
+.item {
+	background: rgba(102, 255, 255, 0.4);
+}*/

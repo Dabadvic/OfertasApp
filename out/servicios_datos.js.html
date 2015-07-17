@@ -1,6 +1,34 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: servicios/datos.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: servicios/datos.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * @file Servicio utilizado para el uso de los datos internos de la aplicación y conexión con Parse
- * @author David Abad Vich <davidabad10@gmail.com>
+ * @author David Abad Vich &lt;davidabad10@gmail.com>
  * @version 6.1
 */
 
@@ -83,11 +111,9 @@ angular.module('servicio.datos', [])
    * @namespace Servicio datos
    * @requires $ionicLoading
    * @requires $ionicHistory
-   * @requires $localstorage
-   * @requires $timeout
    */
 /* Servicio principal que se encarga de manejar las ofertas */
-.factory('datos', function($ionicLoading, $ionicHistory, $localstorage, $timeout) {
+.factory('datos', function($ionicLoading, $ionicHistory, $localstorage) {
   var ofertas = $localstorage.getObject("ultimasOfertas");
 /*
   // Básicas para pruebas
@@ -181,13 +207,13 @@ angular.module('servicio.datos', [])
           success: function(results) {
             
             // Por cada elemento devuelto, se guarda en ofertas
-            for(var i=0; i < results.length; i++) {
+            for(var i=0; i &lt; results.length; i++) {
               var user = results[i].get("usuario");
               
               var duracion = results[i].get("duracion");
               var usos = results[i].get("usos");
               
-              if(Date.parse(duracion) > Date.parse(hoy) || ((usos > 0) && (duracion == undefined)))
+              if(Date.parse(duracion) > Date.parse(hoy) || ((usos > 0) &amp;&amp; (duracion == undefined)))
                 ofertas.push({
                   nombre: user.get("local"),//results[i].get("local"),
                   descripcion_corta: results[i].get("descripcion_corta"),
@@ -319,7 +345,7 @@ angular.module('servicio.datos', [])
 
                   var pushQuery = new Parse.Query(Parse.Installation);
                   var punto = new Parse.GeoPoint(parseFloat(mensaje.latitud), parseFloat(mensaje.longitud));
-                  pushQuery.withinKilometers("location", punto, 0.5);
+                  pushQuery.withinKilometers("location", punto, 1);
 
                     // Primera notificación
                     Parse.Push.send({
@@ -338,26 +364,25 @@ angular.module('servicio.datos', [])
                     });
 
                     // Resto de notificaciones
-                    $timeout(function(){
-                      var segundaQuery = new Parse.Query(Parse.Installation);
-                      segundaQuery.withinKilometers("location", punto, 1);
-                      segundaQuery.doesNotMatchKeyInQuery("deviceToken", "deviceToken", pushQuery);
+                    var segundaQuery = new Parse.Query(Parse.Installation);
+                    segundaQuery.withinKilometers("location", punto, 1);
+                    segundaQuery.doesNotMatchKeyInQuery("deviceToken", "deviceToken", pushQuery);
 
-                      Parse.Push.send({
-                        where: segundaQuery,
-                        data: {
-                          alert: "Oferta: " + oferta.descripcion_corta,
-                          oferta: JSON.stringify(mensaje)
-                        }
-                      }, {
-                        success: function () {
-                          console.log("Oferta enviada");
-                        },
-                        error: function (error) {
-                          console.log(error);
-                        }
-                      });
-                    }, 900000);
+                    Parse.Push.send({
+                      where: segundaQuery,
+                      data: {
+                        alert: "Oferta: " + oferta.descripcion_corta,
+                        oferta: JSON.stringify(mensaje)
+                      }
+                    }, {
+                      success: function () {
+                        console.log("Oferta enviada");
+                      },
+                      error: function (error) {
+                        console.log(error);
+                      }
+                    });
+
                     
 
                     // Enviar otra notificación pasados 15 min 
@@ -437,4 +462,26 @@ angular.module('servicio.datos', [])
   }
 })
 
-;
+;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="$localstorage.html">$localstorage</a></li><li><a href="Servicio%2520datos.html">Servicio datos</a></li></ul><h3>Global</h3><ul><li><a href="global.html#controladorDetalles">controladorDetalles</a></li><li><a href="global.html#controladorOfertas">controladorOfertas</a></li><li><a href="global.html#controladorPublicar">controladorPublicar</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Tue Jul 14 2015 14:28:49 GMT+0200 (Hora de verano romance)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

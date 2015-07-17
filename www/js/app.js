@@ -2,7 +2,16 @@
 angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Preferencias', 'controlador.Registro', 'controlador.editar', 'ngCordova'])
 
 // Este lo trae así por defecto
-.run(function($ionicPlatform, $localstorage, $cordovaPush, $rootScope) {
+.run(function($ionicPlatform, $localstorage, $cordovaPush, $rootScope, $state, $ionicHistory) {
+
+  $ionicPlatform.registerBackButtonAction(function (event) {
+    if($state.current.name=="ofertas"){
+      navigator.app.exitApp();
+    }
+    else {
+      $ionicHistory.goBack();
+    }
+  }, 100);
 
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -17,74 +26,6 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Pre
     // Preparar Parse con la ID de la aplicación y la clave de JavaScript (ambas en la web)
     Parse.initialize("4R2V91bSep94FYqbspK1UkLIAL2Kd5IQJFCmZsMB", "aaHJB3mLTT2UmgaUyEvn2PQKBpO60WQDFqWNTodO");
 
-      // Inicializar el plugin para notificaciones push
-      window.onNotification = function(e) {
-        console.log(e);
-        switch( e.event )
-          {
-          case 'registered':
-              if ( e.regid.length > 0 )
-              {
-                  // Your GCM push server needs to know the regID before it can push to this device
-                  // here is where you might want to send it the regID for later use.
-                  console.log("regID = " + e.regid);
-              }
-          break;
-
-          case 'message':
-              // if this flag is set, this notification happened while we were in the foreground.
-              // you might want to play a sound to get the user's attention, throw up a dialog, etc.
-              if ( e.foreground )
-              {
-                console.log("Inline");
-              }
-              else
-              {  // otherwise we were launched because the user touched a notification in the notification tray.
-                  if ( e.coldstart )
-                  {
-                    alert("Coldstart");
-                  }
-                  else
-                  {
-                    alert("Background");
-                  }
-              }
-
-              console.log(e.payload.message);
-          break;
-
-          case 'error':
-              console.log("Error indefinido");
-          break;
-
-          default:
-              console.log("Default");
-          break;
-        }
-      }
-
-      // result contains any message sent from the plugin call
-      function successHandler (result) {
-          console.log('result = ' + result);
-      }
-
-      // result contains any error description text returned from the plugin call
-      function errorHandler (error) {
-          console.log('error = ' + error);
-      }
-/*
-      var pushNotification;
-      document.addEventListener("deviceready", function(){
-        pushNotification = window.plugins.pushNotification;
-        pushNotification.register(
-        successHandler,
-        errorHandler,
-        {
-            "senderID":"792773052245",
-            "ecb":"onNotification"
-        });
-      });
-*/
 
         window.ParsePushPlugin.register({}, 
         function() {
@@ -168,7 +109,7 @@ var clientKey = "BWlU4AtdgyJsSLklJTYN4nk9cWpQNeuXZPxbALtp";
 
 // Para la navegación entre vistas
 .config(function($stateProvider, $urlRouterProvider) {
-  $urlRouterProvider.otherwise('/')
+  $urlRouterProvider.otherwise('ofertas')
 
 // Vista principal, que es la que se carga si no hay nada (especificado en el otherwise)
   $stateProvider.state('ofertas', {
@@ -178,7 +119,6 @@ var clientKey = "BWlU4AtdgyJsSLklJTYN4nk9cWpQNeuXZPxbALtp";
     resolve: {
       oferta: function($stateParams) {
         if ($stateParams.oferta) {
-          console.log("Iniciando con oferta");
           var obj = JSON.parse($stateParams.oferta);
           return obj;
         } else {
@@ -247,8 +187,6 @@ var clientKey = "BWlU4AtdgyJsSLklJTYN4nk9cWpQNeuXZPxbALtp";
     controller: 'controladorDetalles',
     resolve: {
       oferta: function($stateParams) {
-        //return datos.getOferta($stateParams.ofertaId)
-        console.log($stateParams.oferta);
         var obj = JSON.parse($stateParams.oferta);
         return obj;
       }
