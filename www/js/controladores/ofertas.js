@@ -8,13 +8,20 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 
 /**
    * @ngdoc controller
-   * @name controladorOfertas
+   * @namespace controladorOfertas
    * @requires $scope, $state, $localstorage, $ionicLoading, $cordovaPush, $rootScope, $timeout, $ionicPopup
    * @property {Hash} controls collection of Controls initiated within `map` directive
    * @property {Hash} markers collection of Markers initiated within `map` directive
    */
 .controller('controladorOfertas', function($scope, $state, $localstorage, $ionicLoading, $cordovaPush, $rootScope, $timeout, $ionicPopup, oferta, datos) {
   
+	function ofertasVacio() {
+		if ($localstorage.get("hay_ofertas", "no") == "si") {
+			document.getElementById("mensajeOfertas").style.display='none';
+		} else {
+		  	document.getElementById("mensajeOfertas").style.display='inherit';
+		}
+	}
 
   	/**
      * Se carga antes que la vista asignada a este controlador para comprobar si se ha recibido una oferta.
@@ -26,11 +33,12 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 		  	console.log("Cambiando a oferta");
 		  	$state.go('detalle', {oferta: JSON.stringify(oferta)});
 		  	oferta = undefined;
-		} else {
-			console.log("No hay oferta");
 		}
 
+		console.log("No hay oferta");
 		$scope.nombre = $localstorage.get("user", "");
+		
+		ofertasVacio();
 
 	/*
 		if ($localstorage.get("notificaciones", true) == "true")
@@ -57,6 +65,7 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
   	console.log("Va a recargar los datos");
   	datos.cargarDatos();
   	$scope.ofertas = datos.getOfertas();
+  	$timeout(ofertasVacio, 2000);
   }
 
 /**
@@ -68,6 +77,7 @@ function compruebaGPS() {
  // Avisar al usuario de que tiene el GPS desactivado
   	var gpsStatus = "NO";
 	navigator.geolocation.getCurrentPosition(function(pos){
+		console.log(pos);
 		var ultimaPosicion = {latitud: pos.coords.latitude, longitud: pos.coords.longitude};
 		$localstorage.setObject("ultimaPosicionConocida", ultimaPosicion);
 	    gpsStatus = "OK";
@@ -82,13 +92,15 @@ function compruebaGPS() {
 	});
 
 	$timeout(function(){
-	    if(gpsStatus == "OK")
-	    	console.log("Estado del GPS: " + gpsStatus)
-	    else
+	    if(gpsStatus == "OK") {
+	    	console.log("Estado del GPS: " + gpsStatus);
+	    	$scope.recargarDatos();
+	    } else {
 	    	var alertPopup = $ionicPopup.alert({
 				title: 'GPS inactivo',
 				template: 'Es posible que el GPS esté desactivado o haya sido recientemente activado, por favor, actívelo y espere unos segundos. Gracias.'
 			});
+	    }
 	}, 1500);
 }
 
@@ -108,7 +120,7 @@ function compruebaGPS() {
    * @name controladorDetalles
    * @requires $scope, $ionicModal, $compile, $ionicLoading
    */
-.controller('controladorDetalles', function($scope, $ionicModal, $compile, $ionicLoading, $cordovaBarcodeScanner, oferta) {
+.controller('controladorDetalles', function($scope, $ionicModal, $compile, $ionicLoading, $cordovaBarcodeScanner, $ionicPopup, $ionicHistory, oferta) {
   $scope.oferta = oferta;
 
   $scope.nombreEs = decodeURIComponent(oferta.nombre);
@@ -117,6 +129,9 @@ function compruebaGPS() {
     	$scope.textoCanjear = "Canjear";
     	$scope.textoComoLlegar = "Como Llegar";
     	document.getElementById("botonBorrarOferta").style.display='none';
+    	document.getElementById("divCodigoQR").style.display='none';
+    	document.getElementById("botonEstadisticasOferta").style.display='none';
+    	document.getElementById("divEstadisticasOferta").style.display='none';
   	});
 
   $scope.mapControl = {};
@@ -149,15 +164,57 @@ function compruebaGPS() {
 
   var codigoqr = undefined;
   $scope.canjearOferta = function() {
-  	if (codigoqr == undefined)
-	  	codigoqr = new QRCode(document.getElementById("qrcode"), {
-		    text: "codigoGuay123",
-		    width: 200,
-		    height: 200,
-		    colorDark : "#000000",
-		    colorLight : "#ffffff",
-		    correctLevel : QRCode.CorrectLevel.H
-		});
+  	if (codigoqr == undefined) {
+  		$ionicLoading.show({
+	        template: 'preparando oferta'
+	    });
+
+	    window.ParsePushPlugin.on('receivePN', function(pn){
+            console.log('Recibida notificacion');
+            console.log(pn);
+            if(pn.silent) {
+                if(pn.valid) {
+                	$ionicPopup.alert({
+					    title: 'Código validado',
+					    template: 'El código escaneado es correcto'
+					}).then(function(res) {
+				    	console.log('Fin de alerta');
+				    	$ionicHistory.goBack();
+				   	});
+                } else {
+                	$ionicPopup.alert({
+					    title: 'Código incorrecto',
+					    template: '¡El código no pertenece a la oferta!'
+					});
+                }
+            }
+        });
+
+		window.ParsePushPlugin.getInstallationId(function(id) {
+            console.log("Obtenida id de la instalacion: " + id);
+            var CodigoObject = Parse.Object.extend("CodigoOferta");
+            var codigo = new CodigoObject();
+            codigo.set("id_oferta", oferta.id);
+            codigo.set("installationId", id);
+            codigo.save(null, {
+            	success: function(code) {
+            		console.log("Código creado con éxito, empezando QR");
+            		document.getElementById("divCodigoQR").style.display='inherit';
+				  	codigoqr = new QRCode(document.getElementById("qrcode"), {
+					    text: code.id,
+					    width: 200,
+					    height: 200,
+					    colorDark : "#000000",
+					    colorLight : "#ffffff",
+					    correctLevel : QRCode.CorrectLevel.H
+					});
+					$ionicLoading.hide();
+            	}
+            });
+        }, function(e) {
+            alert('error');
+        });
+	}
   }
 
 })
@@ -200,136 +257,6 @@ function compruebaGPS() {
 			$ionicHistory.goBack();
 		}
 	}
-})
-
-
-.controller('controladorOfertasPublicadas', function($scope, datos, $localstorage, $ionicHistory, $ionicLoading, $ionicPopup) {
-	$scope.borrar = function(oferta) {
-		var confirmPopup = $ionicPopup.confirm({
-		    title: 'Borrar oferta',
-		    template: '¿Estás seguro de que quieres borrar la oferta?'
-		});
-		confirmPopup.then(function(res) {
-		    if(res) {
-		    	datos.borrarOferta(oferta);
-		    	$ionicHistory.goBack();
-		    } else {
-		    	console.log('No borrando');
-		    }
-		});
-		
-	}
-
-	$scope.$on('$ionicView.beforeEnter', function() {
-		var OfertaObject = Parse.Object.extend("OfertaObject");
-	    var query = new Parse.Query(OfertaObject);
-	    var ofertas = [];
-	    var hoy = new Date();
-	    $scope.vigentes = [];
-	    $scope.caducadas = [];
-	    var usuarioId = $localstorage.get("id", undefined);
-
-	    query.include("usuario");
-
-	    $ionicLoading.show({
-	        template: 'loading'
-	    });
-
-        query.find({  // Petición query
-          success: function(results) {
-            // Por cada elemento devuelto, se guarda en ofertas
-          for(var i=0; i < results.length; i++) {
-            var user = results[i].get("usuario");
-              
-            if(usuarioId == user.id) {
-                ofertas.push({
-                  descripcion_corta: results[i].get("descripcion_corta"),
-                  descripcion: results[i].get("descripcion"),
-                  duracion: results[i].get("duracion"),
-                  usos: results[i].get("usos"),
-                  id: results[i].id
-                });
-            }
-          }
-
-          // Ordena ofertas por vigentes y caducadas
-          for(var i = 0; i < ofertas.length; i++) {
-          	var duracion = ofertas[i].duracion;
-          	if (duracion)
-          		ofertas[i].fin = duracion.getHours() + ":" + ((duracion.getMinutes().toString().length == 1) ? "0" + duracion.getMinutes() : duracion.getMinutes())
-          					+ " " + duracion.getDate() + "/" + (duracion.getMonth()+1) + "/" + duracion.getFullYear();
-          	else
-          		ofertas[i].fin = "Marcada por usos";
-          	
-          	if(ofertas[i].duracion != undefined && Date.parse(ofertas[i].duracion) < Date.parse(hoy)) {
-          		$scope.caducadas.push(ofertas[i]);
-          	} else {
-          		$scope.vigentes.push(ofertas[i]);
-          	}
-          }
-
-            $ionicLoading.hide();
-          },
-
-          error: function(error) {
-            console.log("Error: " + error.code + " " + error.message);
-            alert("No leo de la base de datos");
-          }
-        });
-	})
-})
-
-/* Controlador para los detalles de una pregunta que ya ha sido publicada.
-	
-	Antes de entrar cambia los nombres en el html
- */
-.controller('controladorDetallesPublicada', function($scope, oferta, $state, datos, $ionicPopup, $ionicHistory, $cordovaBarcodeScanner) {
-	$scope.oferta = oferta;
-
-	$scope.canjearOferta = function() {
-        $cordovaBarcodeScanner.scan().then(function(imageData) {
-            console.log(imageData.text);
-            console.log("Barcode Format -> " + imageData.format);
-            console.log("Cancelled -> " + imageData.cancelled);
-        }, function(error) {
-            console.log("An error happened -> " + error);
-        });
-    };
-
-	$scope.borrarOferta = function(oferta) {
-		var confirmPopup = $ionicPopup.confirm({
-		    title: 'Borrar oferta',
-		    template: '¿Estás seguro de que quieres borrar la oferta?'
-		});
-		confirmPopup.then(function(res) {
-		    if(res) {
-		    	// Retroceder dos vistas
-				// get the right history stack based on the current view
-			    var historyId = $ionicHistory.currentHistoryId();
-			    var history = $ionicHistory.viewHistory().histories[historyId];
-			    // set the view 'depth' back in the stack as the back view
-			    var targetViewIndex = history.stack.length - 1 - 2;
-			    $ionicHistory.backView(history.stack[targetViewIndex]);
-			    // navigate to it
-			    $ionicHistory.goBack();
-			   	datos.borrarOferta(oferta);
-		    } else {
-		    	console.log('No borrando');
-		    }
-		});
-	}
-
-	$scope.abreMapa = function() {
-		$state.go('publicarOferta', {oferta: JSON.stringify($scope.oferta)});
-	}
-
-	$scope.$on('$ionicView.beforeEnter', function() {
-    	document.getElementById("imagenCanjearOferta").className = "icon ion-camera";
-    	document.getElementById("imagenComoLlegarOferta").className = "icon ion-document-text";
-    	$scope.textoCanjear = "Escanear";
-    	$scope.textoComoLlegar = "Editar";
-    	$scope.textoBorrar = "Borrar";
-  	})
 })
 
 ;

@@ -21,8 +21,14 @@
           <p> <h2 id="nombreOfertaMain">{{decode(oferta.nombre)}}</h2> <h3 id="distanciaOferta">{{oferta.distancia}} m</h3> <br>
            <h3 id="descripcionOferta">{{oferta.descripcion_corta}}</h3>  <h3 id="finOferta">{{oferta.fin}}</h3></p>
         </div>
-        </ion-item>
+        </ion-item> 
       </ion-list>
+
+      <div class="list card" id="mensajeOfertas">
+        <p>Ninguna oferta disponible, por favor recarga las ofertas pulsando el botón actualizar 
+        <img src="img/ic_cached.png" alt="Preferencias" width="20" height="20"> situado en la barra superior, zona derecha. </p>
+        <p>Nota: Es posible que no haya ninguna oferta cercana.</p>
+      </div>
 
     </ion-content>
   </ion-pane>

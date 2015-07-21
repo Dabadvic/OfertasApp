@@ -8,7 +8,7 @@
   <ion-content>
     <div class="list card">
     <div class="oferta">
-        <div class="item">
+        <div class="item" id="divNombreEs">
           <h3>{{nombreEs}}</h3>
         </div>
         <div class="item">
@@ -20,14 +20,21 @@
         </div>
     </div>
       <div class="item tabs tabs-secondary tabs-icon-left">
-        <a class="tab-item" style="font-size: 16px;" ng-click="canjearOferta()">
+        <a class="tab-item" id="botonCanjearOferta" style="font-size: 16px;" ng-click="canjearOferta()">
           <i class="icon ion-android-checkbox-outline" id="imagenCanjearOferta"></i>
           {{textoCanjear}}
         </a>
+
         <a class="tab-item" id="botonComoLlegarOferta" style="font-size: 16px;" ng-click="abreMapa()">
           <i class="icon ion-map" id="imagenComoLlegarOferta"></i>
           {{textoComoLlegar}}
         </a>
+
+        <a class="tab-item" id="botonEstadisticasOferta" style="font-size: 16px;" ng-click="activaEstadisticas()">
+          <i class="icon ion-stats-bars" id="imagenComoLlegarOferta"></i>
+          {{textoEstadisticas}}
+        </a>
+
         <a class="tab-item" id="botonBorrarOferta" style="font-size: 16px;" ng-click="borrarOferta(oferta)">
           <i class="icon ion-trash-b" id="imagenBorrarOferta"></i>
           {{textoBorrar}}
@@ -35,7 +42,15 @@
       </div>
     </div>
 
-    <div class="list card" ><div id="qrcode" style="margin: auto; width: 200px;"></div></div>
+    <div class="list card" id="divCodigoQR">
+      Muestra el siguiente código QR para aplicar tu oferta!
+      <div id="qrcode" style="margin: auto; width: 200px;"></div>
+    </div>
+
+    <div class="list card" id="divEstadisticasOferta">
+      <h4>Datos sobre uso:</h4>
+      <p>- Veces usada: {{oferta.veces_usada}}</p>
+    </div>
 
   </ion-content>
 </ion-view>

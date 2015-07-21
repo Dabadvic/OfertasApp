@@ -1,5 +1,5 @@
 // Se indica el nombre del módulo y un array de los componentes que requiere
-angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Preferencias', 'controlador.Registro', 'controlador.editar', 'ngCordova'])
+angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controladores.ofertasPublicadas', 'controlador.Preferencias', 'controlador.Registro', 'controlador.editar', 'ngCordova'])
 
 // Este lo trae así por defecto
 .run(function($ionicPlatform, $localstorage, $cordovaPush, $rootScope, $state, $ionicHistory) {
@@ -31,24 +31,26 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controlador.Pre
         function() {
             console.log('successfully registered device!');
             $localstorage.set("registrado", true);
-            
+            /*
             window.ParsePushPlugin.getInstallationId(function(id) {
                 console.log(id);
             }, function(e) {
                 alert('error');
             });
-            
+            */
             window.ParsePushPlugin.getSubscriptions(function(subscriptions) {
                 console.log(subscriptions);
             }, function(e) {
                 alert('error');
             });
             
-            window.ParsePushPlugin.subscribe('news', function(msg) {
-                console.log('Suscrito a news');
-            }, function(e) {
-                alert('error');
-            });
+            if($localstorage.get("notificaciones", true)) {
+              window.ParsePushPlugin.subscribe('news', function(msg) {
+                  console.log('Suscrito a news');
+              }, function(e) {
+                  alert('error');
+              });
+            }
 
             window.ParsePushPlugin.on('receivePN', function(pn){
               console.log('Recibida notificacion');

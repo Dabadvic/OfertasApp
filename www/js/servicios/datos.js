@@ -179,15 +179,17 @@ angular.module('servicio.datos', [])
 
         query.find({  // Petición query
           success: function(results) {
-            
+            var hay_ofertas = "no";
             // Por cada elemento devuelto, se guarda en ofertas
             for(var i=0; i < results.length; i++) {
               var user = results[i].get("usuario");
               
               var duracion = results[i].get("duracion");
               var usos = results[i].get("usos");
+              var distancia_oferta = distancia( userLat, userLon, user.get("latitud"),user.get("longitud") );
               
-              if(Date.parse(duracion) > Date.parse(hoy) || ((usos > 0) && (duracion == undefined)))
+              if((Date.parse(duracion) > Date.parse(hoy) || ((usos > 0) && (duracion == undefined))) && distancia_oferta < 1000) {
+                hay_ofertas = "si";
                 ofertas.push({
                   nombre: user.get("local"),//results[i].get("local"),
                   descripcion_corta: results[i].get("descripcion_corta"),
@@ -203,7 +205,10 @@ angular.module('servicio.datos', [])
                   longitud: user.get("longitud"),
                   id: results[i].id
                 });
+              }
             }
+
+            $localstorage.set("hay_ofertas", hay_ofertas);
 
             ofertas.sort(function(a, b){
               return (a.distancia - b.distancia);
@@ -222,7 +227,10 @@ angular.module('servicio.datos', [])
         });
 
       }, function (error) {
-        alert('Unable to get location: ' + error.message);
+        alert('No se ha podido obtener la localización');
+        console.log(error);
+        $localstorage.set("hay_ofertas", 'false');
+        $ionicLoading.hide();
       });
 
     },
@@ -294,6 +302,7 @@ angular.module('servicio.datos', [])
       ofer.set("descripcion_corta", oferta.descripcion_corta);
       ofer.set("duracion", oferta.duracion);
       ofer.set("usos", oferta.usos);
+      ofer.set("veces_usada", 0);
 
       var UserObject = Parse.Object.extend("UserObject");
       var query = new Parse.Query(UserObject);
@@ -314,12 +323,13 @@ angular.module('servicio.datos', [])
                   //"distancia":819,
                   latitud: user.get("latitud"),
                   longitud: user.get("longitud"),
-                  id: user.id
+                  id: off.id
                 };
 
                   var pushQuery = new Parse.Query(Parse.Installation);
                   var punto = new Parse.GeoPoint(parseFloat(mensaje.latitud), parseFloat(mensaje.longitud));
-                  pushQuery.withinKilometers("location", punto, 0.5);
+                  pushQuery.withinKilometers("location", punto, 1);
+                  pushQuery.equalTo("channels", "news");
 
                     // Primera notificación
                     Parse.Push.send({
@@ -342,6 +352,7 @@ angular.module('servicio.datos', [])
                       var segundaQuery = new Parse.Query(Parse.Installation);
                       segundaQuery.withinKilometers("location", punto, 1);
                       segundaQuery.doesNotMatchKeyInQuery("deviceToken", "deviceToken", pushQuery);
+                      pushQuery.equalTo("channels", "news");
 
                       Parse.Push.send({
                         where: segundaQuery,
@@ -359,11 +370,6 @@ angular.module('servicio.datos', [])
                       });
                     }, 900000);
                     
-
-                    // Enviar otra notificación pasados 15 min 
-                    //$timeout(function(){
-
-                    //}, 900000);
               },
               error: function(off, error) {
                 alert('Failed to create new object, with error code: ' + error.message);

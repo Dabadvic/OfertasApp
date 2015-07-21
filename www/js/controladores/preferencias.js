@@ -30,7 +30,21 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
   })
 
   $scope.notificaciones = function() {
-    $localstorage.set("notificaciones", $scope.recibirNotificaciones.checked);
+    var notificaciones = $scope.recibirNotificaciones.checked;
+    $localstorage.set("notificaciones", notificaciones);
+    if(notificaciones) {
+      window.ParsePushPlugin.subscribe('news', function(msg) {
+        console.log('Suscrito a news');
+      }, function(e) {
+        alert('error');
+      });
+    } else {
+      window.ParsePushPlugin.unsubscribe('news', function(msg) {
+        console.log('Cancelada subscripción a news');
+      }, function(e) {
+        alert('error');
+      });
+    }
   };
 
   $scope.borrarDatos = function() {
