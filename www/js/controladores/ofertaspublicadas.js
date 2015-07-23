@@ -1,3 +1,9 @@
+/**
+ * @file Controlador de los templates relacionados con las ofertas ya publicadas
+ * @author David Abad Vich <davidabad10@gmail.com>
+ * @version 6.1
+*/
+
 angular.module('controladores.ofertasPublicadas', ['servicio.datos', 'servicio.mapas', 'ionic', 'ngCordova'])
 
 

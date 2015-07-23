@@ -159,80 +159,107 @@ angular.module('servicio.datos', [])
      * @memberof Servicio datos
      * @inner
      */
-    cargarDatos: function() {
+    cargarDatos: function(userLat, userLon) {
+      var promesa = new Parse.Promise();
       var hoy = new Date();
       var OfertaObject = Parse.Object.extend("OfertaObject");
       var query = new Parse.Query(OfertaObject);
 
-      $ionicLoading.show({
-          template: 'loading'
-        });
       ofertas = [];
 
       query.include("usuario");
 
+/*
       var userLat; 
       var userLon;
       navigator.geolocation.getCurrentPosition(function (pos) { // Obtener la ubicación
         userLat = pos.coords.latitude; 
         userLon = pos.coords.longitude;
+        console.log(pos);
+*/
+        console.log("cargarDatos: Hace query");
 
-        query.find({  // Petición query
-          success: function(results) {
-            var hay_ofertas = "no";
-            // Por cada elemento devuelto, se guarda en ofertas
-            for(var i=0; i < results.length; i++) {
-              var user = results[i].get("usuario");
-              
-              var duracion = results[i].get("duracion");
-              var usos = results[i].get("usos");
-              var distancia_oferta = distancia( userLat, userLon, user.get("latitud"),user.get("longitud") );
-              
-              if((Date.parse(duracion) > Date.parse(hoy) || ((usos > 0) && (duracion == undefined))) && distancia_oferta < 1000) {
-                hay_ofertas = "si";
-                ofertas.push({
-                  nombre: user.get("local"),//results[i].get("local"),
-                  descripcion_corta: results[i].get("descripcion_corta"),
-                  descripcion: results[i].get("descripcion"),
-                  fin: obtenerFin(duracion, usos),
-                  duracion: duracion,
-                  usos: usos,
-                  distancia: distancia(
-                    userLat, userLon, 
-                    user.get("latitud"),user.get("longitud")
-                    ),
-                  latitud: user.get("latitud"),
-                  longitud: user.get("longitud"),
-                  id: results[i].id
-                });
-              }
-            }
+        query.find().then(
+            function(results) {
+                var hay_ofertas = "no";
+                    // Por cada elemento devuelto, se guarda en ofertas
+                    for(var i=0; i < results.length; i++) {
+                      var user = results[i].get("usuario");
+                      
+                      var duracion = results[i].get("duracion") == undefined ? undefined : new Date(results[i].get("duracion"));
+                      var usos = results[i].get("usos");
+                      var distancia_oferta = distancia( userLat, userLon, user.get("latitud"),user.get("longitud") );
 
-            $localstorage.set("hay_ofertas", hay_ofertas);
+                      if (distancia_oferta < 1000) {
+                          if (duracion == undefined && usos > 0) {
+                              hay_ofertas = "si";
+                              ofertas.push({
+                                nombre: user.get("local"),//results[i].get("local"),
+                                descripcion_corta: results[i].get("descripcion_corta"),
+                                descripcion: results[i].get("descripcion"),
+                                fin: obtenerFin(duracion, usos),
+                                duracion: duracion,
+                                usos: usos,
+                                distancia: distancia(
+                                  userLat, userLon, 
+                                  user.get("latitud"),user.get("longitud")
+                                  ),
+                                latitud: user.get("latitud"),
+                                longitud: user.get("longitud"),
+                                id: results[i].id
+                              });
+                          } else if (duracion != undefined) {
+                              if ((duracion.getHours() >= hoy.getHours()) && (Date.parse(duracion) > Date.parse(hoy))) {
+                                  hay_ofertas = "si";
+                                  ofertas.push({
+                                    nombre: user.get("local"),//results[i].get("local"),
+                                    descripcion_corta: results[i].get("descripcion_corta"),
+                                    descripcion: results[i].get("descripcion"),
+                                    fin: obtenerFin(duracion, usos),
+                                    duracion: duracion,
+                                    usos: usos,
+                                    distancia: distancia(
+                                      userLat, userLon, 
+                                      user.get("latitud"),user.get("longitud")
+                                      ),
+                                    latitud: user.get("latitud"),
+                                    longitud: user.get("longitud"),
+                                    id: results[i].id
+                                  });
+                              }
+                          }
+                      }
 
-            ofertas.sort(function(a, b){
-              return (a.distancia - b.distancia);
-            });
+                    }
 
-            $ionicLoading.hide();
+                    $localstorage.set("hay_ofertas", hay_ofertas);
 
-            $localstorage.setObject("ultimasOfertas", ofertas);
-            return ofertas;
-          },
+                    ofertas.sort(function(a, b){
+                      return (a.distancia - b.distancia);
+                    });
 
-          error: function(error) {
-            console.log("Error: " + error.code + " " + error.message);
-            alert("No leo de la base de datos");
-          }
-        });
 
+                    $localstorage.setObject("ultimasOfertas", ofertas);
+
+                    promesa.resolve("éxito");
+                    
+            },
+            function(error){
+                console.log("Error: " + error.code + " " + error.message);
+                alert("No leo de la base de datos");
+                $ionicLoading.hide();
+                promesa.reject(error);
+            })
+/*
       }, function (error) {
         alert('No se ha podido obtener la localización');
         console.log(error);
         $localstorage.set("hay_ofertas", 'false');
         $ionicLoading.hide();
+        promesa.reject(error);
       });
-
+      */
+      return promesa;
     },
 
     /**

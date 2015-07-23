@@ -65,3 +65,28 @@ map {
 .item {
 	background: rgba(102, 255, 255, 0.4);
 }*/
+
+.texto {
+	color:black;
+	transition:color 2s;
+}
+
+.textoError {
+	color:red;
+}
+
+.caja {
+	transition:box-shadow 2s;
+}
+
+.cajaError {
+	box-shadow: inset 0px 0px 0.5em red;
+}
+
+.item {
+	padding-right: 16px;
+}
+
+p.help-block {
+	color: red;
+}

@@ -111,9 +111,11 @@ angular.module('servicio.datos', [])
    * @namespace Servicio datos
    * @requires $ionicLoading
    * @requires $ionicHistory
+   * @requires $localstorage
+   * @requires $timeout
    */
 /* Servicio principal que se encarga de manejar las ofertas */
-.factory('datos', function($ionicLoading, $ionicHistory, $localstorage) {
+.factory('datos', function($ionicLoading, $ionicHistory, $localstorage, $timeout) {
   var ofertas = $localstorage.getObject("ultimasOfertas");
 /*
   // Básicas para pruebas
@@ -205,31 +207,62 @@ angular.module('servicio.datos', [])
 
         query.find({  // Petición query
           success: function(results) {
-            
+            var hay_ofertas = "no";
             // Por cada elemento devuelto, se guarda en ofertas
             for(var i=0; i &lt; results.length; i++) {
               var user = results[i].get("usuario");
               
               var duracion = results[i].get("duracion");
               var usos = results[i].get("usos");
+              var distancia_oferta = distancia( userLat, userLon, user.get("latitud"),user.get("longitud") );
+
               
-              if(Date.parse(duracion) > Date.parse(hoy) || ((usos > 0) &amp;&amp; (duracion == undefined)))
-                ofertas.push({
-                  nombre: user.get("local"),//results[i].get("local"),
-                  descripcion_corta: results[i].get("descripcion_corta"),
-                  descripcion: results[i].get("descripcion"),
-                  fin: obtenerFin(duracion, usos),
-                  duracion: duracion,
-                  usos: usos,
-                  distancia: distancia(
-                    userLat, userLon, 
-                    user.get("latitud"),user.get("longitud")
-                    ),
-                  latitud: user.get("latitud"),
-                  longitud: user.get("longitud"),
-                  id: results[i].id
-                });
+              //if((Date.parse(duracion) > Date.parse(hoy) || ((usos > 0) &amp;&amp; (duracion == undefined))) &amp;&amp; distancia_oferta &lt; 1000) {
+              //if(( (duracion.getHours() &lt;= hoy.getHours()) || ((usos > 0) &amp;&amp; (duracion == undefined)) ) &amp;&amp; distancia_oferta &lt; 1000) {
+
+              if (distancia_oferta &lt; 1000) {
+                  if (duracion == undefined &amp;&amp; usos > 0) {
+                      hay_ofertas = "si";
+                      ofertas.push({
+                        nombre: user.get("local"),//results[i].get("local"),
+                        descripcion_corta: results[i].get("descripcion_corta"),
+                        descripcion: results[i].get("descripcion"),
+                        fin: obtenerFin(duracion, usos),
+                        duracion: duracion,
+                        usos: usos,
+                        distancia: distancia(
+                          userLat, userLon, 
+                          user.get("latitud"),user.get("longitud")
+                          ),
+                        latitud: user.get("latitud"),
+                        longitud: user.get("longitud"),
+                        id: results[i].id
+                      });
+                  } else if (duracion != undefined) {
+                      if (duracion.getHours() &lt;= hoy.getHours()) {
+                          hay_ofertas = "si";
+                          ofertas.push({
+                            nombre: user.get("local"),//results[i].get("local"),
+                            descripcion_corta: results[i].get("descripcion_corta"),
+                            descripcion: results[i].get("descripcion"),
+                            fin: obtenerFin(duracion, usos),
+                            duracion: duracion,
+                            usos: usos,
+                            distancia: distancia(
+                              userLat, userLon, 
+                              user.get("latitud"),user.get("longitud")
+                              ),
+                            latitud: user.get("latitud"),
+                            longitud: user.get("longitud"),
+                            id: results[i].id
+                          });
+                      }
+                  }
+              }
+
             }
+
+            $localstorage.set("hay_ofertas", hay_ofertas);
 
             ofertas.sort(function(a, b){
               return (a.distancia - b.distancia);
@@ -248,7 +281,10 @@ angular.module('servicio.datos', [])
         });
 
       }, function (error) {
-        alert('Unable to get location: ' + error.message);
+        alert('No se ha podido obtener la localización');
+        console.log(error);
+        $localstorage.set("hay_ofertas", 'false');
+        $ionicLoading.hide();
       });
 
     },
@@ -320,6 +356,7 @@ angular.module('servicio.datos', [])
       ofer.set("descripcion_corta", oferta.descripcion_corta);
       ofer.set("duracion", oferta.duracion);
       ofer.set("usos", oferta.usos);
+      ofer.set("veces_usada", 0);
 
       var UserObject = Parse.Object.extend("UserObject");
       var query = new Parse.Query(UserObject);
@@ -340,12 +377,13 @@ angular.module('servicio.datos', [])
                   //"distancia":819,
                   latitud: user.get("latitud"),
                   longitud: user.get("longitud"),
-                  id: user.id
+                  id: off.id
                 };
 
                   var pushQuery = new Parse.Query(Parse.Installation);
                   var punto = new Parse.GeoPoint(parseFloat(mensaje.latitud), parseFloat(mensaje.longitud));
                   pushQuery.withinKilometers("location", punto, 1);
+                  pushQuery.equalTo("channels", "news");
 
                     // Primera notificación
                     Parse.Push.send({
@@ -364,31 +402,28 @@ angular.module('servicio.datos', [])
                     });
 
                     // Resto de notificaciones
-                    var segundaQuery = new Parse.Query(Parse.Installation);
-                    segundaQuery.withinKilometers("location", punto, 1);
-                    segundaQuery.doesNotMatchKeyInQuery("deviceToken", "deviceToken", pushQuery);
+                    $timeout(function(){
+                      var segundaQuery = new Parse.Query(Parse.Installation);
+                      segundaQuery.withinKilometers("location", punto, 1);
+                      segundaQuery.doesNotMatchKeyInQuery("deviceToken", "deviceToken", pushQuery);
+                      pushQuery.equalTo("channels", "news");
 
-                    Parse.Push.send({
-                      where: segundaQuery,
-                      data: {
-                        alert: "Oferta: " + oferta.descripcion_corta,
-                        oferta: JSON.stringify(mensaje)
-                      }
-                    }, {
-                      success: function () {
-                        console.log("Oferta enviada");
-                      },
-                      error: function (error) {
-                        console.log(error);
-                      }
-                    });
-
+                      Parse.Push.send({
+                        where: segundaQuery,
+                        data: {
+                          alert: "Oferta: " + oferta.descripcion_corta,
+                          oferta: JSON.stringify(mensaje)
+                        }
+                      }, {
+                        success: function () {
+                          console.log("Oferta enviada");
+                        },
+                        error: function (error) {
+                          console.log(error);
+                        }
+                      });
+                    }, 900000);
                     
-
-                    // Enviar otra notificación pasados 15 min 
-                    //$timeout(function(){
-
-                    //}, 900000);
               },
               error: function(off, error) {
                 alert('Failed to create new object, with error code: ' + error.message);
@@ -472,13 +507,13 @@ angular.module('servicio.datos', [])
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="$localstorage.html">$localstorage</a></li><li><a href="Servicio%2520datos.html">Servicio datos</a></li></ul><h3>Global</h3><ul><li><a href="global.html#controladorDetalles">controladorDetalles</a></li><li><a href="global.html#controladorOfertas">controladorOfertas</a></li><li><a href="global.html#controladorPublicar">controladorPublicar</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="$localstorage.html">$localstorage</a></li><li><a href="controladorDetalles.html">controladorDetalles</a></li><li><a href="controladorOfertas.html">controladorOfertas</a></li><li><a href="controladorPublicar.html">controladorPublicar</a></li><li><a href="Servicio%2520datos.html">Servicio datos</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Tue Jul 14 2015 14:28:49 GMT+0200 (Hora de verano romance)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Wed Jul 22 2015 10:09:25 GMT+0200 (Hora de verano romance)
 </footer>
 
 <script> prettyPrint(); </script>

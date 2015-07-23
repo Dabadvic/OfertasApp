@@ -7,23 +7,28 @@
 	<ion-content>
 		<div class="list">
 		  <label class="item item-input item-stacked-label">
-		  	<span class="input-label">Descripción corta</span>
-		    <input type="text" placeholder="La que ve el usuario en pequeño" ng-model="oferta.descripcion_corta">
+		  	<span class="input-label texto" id="textoDescripcionCorta">Descripción corta</span> 
+		    <input type="text" id="inputDescripcionCorta" class="caja" placeholder="La que ve el usuario en pequeño" ng-model="oferta.descripcion_corta">
+		    <p class="help-block" id="errorDescripcionCorta" style="display:none">Debe introducir una descripción corta</p>
 		  </label>
 		  <label class="item item-input item-stacked-label">
-		  	<span class="input-label">Descripción larga</span>
-		    <input type="text" placeholder="La descripción algo más explicada" ng-model="oferta.descripcion">
+		  	<span class="input-label texto" id="textoDescripcionLarga">Descripción larga</span>
+		    <input type="text" id="inputDescripcionLarga" class="caja" placeholder="La descripción algo más explicada" ng-model="oferta.descripcion">
+		    <p class="help-block" id="errorDescripcionLarga" style="display:none">Debe introducir una descripción larga</p>
 		  </label>
 		  </label>
 		  <label class="item item-input item-stacked-label">
-		  	<span class="input-label">Duración (Dejar en blanco si sólo va a tener usos)</span>
-		    <input type="datetime-local" ng-model="oferta.duracion">
+		  	<span class="input-label texto" id="textoDuracion">Duración (Dejar en blanco si sólo va a tener usos)</span>
+		    <input type="datetime-local" id="inputDuracion" class="caja" ng-model="oferta.duracion">
+		    <p class="help-block" id="errorDuracion" style="display:none">{{errorDuracion}}</p>
 		  </label>
 		  <label class="item item-input item-stacked-label">
-		  	<span class="input-label">Usos</span>
-		    <input type="text" placeholder="Dejar en blanco si sólo va a tener duración" ng-model="oferta.usos">
+		  	<span class="input-label texto" id="textoUsos">Usos</span>
+		    <input type="text" id="inputUsos" class="caja" placeholder="Dejar en blanco si sólo va a tener duración" ng-model="oferta.usos">
+		    <p class="help-block" id="errorUsos" style="display:none">{{errorUsos}}</p>
 		  </label>
 		</div>
+		<p class="help-block" id="errorGeneral" style="display:none">Alguno de los campos no es válido</p>
 		<button class="button button-block button-positive" id="botonRegistro" ng-click="publicar()">Publicar</button>
 	</ion-content>
 	</ion-pane> 

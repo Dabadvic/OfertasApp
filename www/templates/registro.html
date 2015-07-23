@@ -7,28 +7,36 @@
 	<ion-content>
 		<div class="list">
 		  <label class="item item-input item-stacked-label">
-		    <input type="text" placeholder="Nombre" ng-model="loginData.nombre">
+		    <input type="text" id="inputNombre" class="caja" placeholder="Nombre" ng-model="loginData.nombre">
+		    <p class="help-block" id="errorNombre" style="display:none">Debe introducir un nombre</p>
 		  </label>
 		  <label class="item item-input item-stacked-label">
-		    <input type="text" placeholder="Apellidos" ng-model="loginData.apellidos">
+		    <input type="text" id="inputApellidos" class="caja" placeholder="Apellidos" ng-model="loginData.apellidos">
+		    <p class="help-block" id="errorApellidos" style="display:none">Debe introducir apellidos</p>
 		  </label>
 		  <label class="item item-input item-stacked-label">
-		    <input type="password" id="textPass" placeholder="Contraseña" ng-model="loginData.password">
+		    <input type="password" id="textPass" class="caja" placeholder="Contraseña" ng-model="loginData.password">
+		    <p class="help-block" id="errorPass" style="display:none">Debe introducir una contraseña</p>
 		  </label>
 		  <label class="item item-input item-stacked-label">
-		    <input type="password" placeholder="Repetir contraseña" ng-model="loginData.repassword">
+		    <input type="password" id="textoRePass" class="caja" placeholder="Repetir contraseña" ng-model="loginData.repassword">
+		    <p class="help-block" id="errorRePass" style="display:none">Las contraseñas no coinciden</p>
 		  </label>
 		  <label class="item item-input item-stacked-label">
-		    <input type="text" placeholder="Correo electrónico" ng-model="loginData.email">
+		    <input type="text" id="inputCorreo" class="caja" placeholder="Correo electrónico" ng-model="loginData.email">
+		    <p class="help-block" id="errorCorreo" style="display:none">Debe introducir un correo válido</p>
 		  </label>
 		  <label class="item item-input item-stacked-label">
-		    <input type="text" placeholder="Nombre del local" ng-model="loginData.local">
+		    <input type="text" id="inputLocal" class="caja" placeholder="Nombre del local" ng-model="loginData.local">
+		    <p class="help-block" id="errorLocal" style="display:none">Debe introducir un nombre</p>
 		  </label>
 		  <button class="button button-block button-positive" id="boton_abre_mapa" ui-sref="mapa">
 		  	Elegir ubicación del local <img src="img/ic_done.png" width="30" height="30" id="elegir_hecho" style="visibility:hidden">
 		  </button>
 		  <span ng-model="localizacion">Latitud: {{localizacion.latitud}} Longitud: {{localizacion.longitud}}</span>
+		  <p class="help-block" id="errorLocalizacion" style="display:none">Debe elegir la ubicación</p>
 		</div>
+		<p class="help-block" id="errorGeneral" style="display:none">Alguno de los campos no es válido</p>
 		<button class="button button-block button-positive" id="botonRegistro" ng-click="registra()">Regístrame</button>
 	</ion-content>
 	</ion-pane> 

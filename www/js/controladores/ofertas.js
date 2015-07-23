@@ -9,9 +9,14 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 /**
    * @ngdoc controller
    * @namespace controladorOfertas
-   * @requires $scope, $state, $localstorage, $ionicLoading, $cordovaPush, $rootScope, $timeout, $ionicPopup
-   * @property {Hash} controls collection of Controls initiated within `map` directive
-   * @property {Hash} markers collection of Markers initiated within `map` directive
+   * @requires $scope
+   * @requires $state
+   * @requires $localstorage
+   * @requires $ionicLoading
+   * @requires $cordovaPush
+   * @requires $rootScope
+   * @requires $timeout
+   * @requires $ionicPopup
    */
 .controller('controladorOfertas', function($scope, $state, $localstorage, $ionicLoading, $cordovaPush, $rootScope, $timeout, $ionicPopup, oferta, datos) {
   
@@ -60,12 +65,20 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 	$state.go('preferencias');
   }
 
-  $scope.recargarDatos = function() {
-  	//compruebaGPS();
+  $scope.recargarDatos = function(lat, lon) {
   	console.log("Va a recargar los datos");
-  	datos.cargarDatos();
-  	$scope.ofertas = datos.getOfertas();
-  	$timeout(ofertasVacio, 2000);
+  	
+  	datos.cargarDatos(lat, lon).then(
+  		function(msg){
+  			console.log("Recive promesa: " + msg);
+  			ofertasVacio();
+  			$scope.ofertas = datos.getOfertas();
+  			$ionicLoading.hide();
+  		});
+  }
+
+  $scope.recarga = function() {
+  	compruebaGPS();
   }
 
 /**
@@ -75,37 +88,53 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 */
 function compruebaGPS() {
  // Avisar al usuario de que tiene el GPS desactivado
-  	var gpsStatus = "NO";
-	navigator.geolocation.getCurrentPosition(function(pos){
-		console.log(pos);
-		var ultimaPosicion = {latitud: pos.coords.latitude, longitud: pos.coords.longitude};
-		$localstorage.setObject("ultimaPosicionConocida", ultimaPosicion);
-	    gpsStatus = "OK";
-
-	    if (window.ParsePushPlugin) {
-	    	window.ParsePushPlugin.setLocation(ultimaPosicion.latitud, ultimaPosicion.longitud, function(msg){
-                  console.log('Ubicación establecida');
-              }, function(e) {
-                  console.log('Error en setLocation: ' + e);
-              });
-	    }
+ 	$ionicLoading.show({
+	    template: 'loading'
 	});
+  	var gpsStatus = "NO";
+  	function gpsLocation() {
+  		var promesa = new Parse.Promise();
+  	
+		navigator.geolocation.getCurrentPosition(function(pos){
+			var ultimaPosicion = {latitud: pos.coords.latitude, longitud: pos.coords.longitude};
+			$localstorage.setObject("ultimaPosicionConocida", ultimaPosicion);
+		    gpsStatus = "OK";
 
-	$timeout(function(){
-	    if(gpsStatus == "OK") {
-	    	console.log("Estado del GPS: " + gpsStatus);
-	    	$scope.recargarDatos();
-	    } else {
-	    	var alertPopup = $ionicPopup.alert({
-				title: 'GPS inactivo',
-				template: 'Es posible que el GPS esté desactivado o haya sido recientemente activado, por favor, actívelo y espere unos segundos. Gracias.'
-			});
-	    }
-	}, 1500);
+		    if (window.ParsePushPlugin) {
+		    	window.ParsePushPlugin.setLocation(ultimaPosicion.latitud, ultimaPosicion.longitud, function(msg){
+	                  console.log('Ubicación establecida');
+	              }, function(e) {
+	                  console.log('Error en setLocation: ' + e);
+	              });
+		    }
+
+		    promesa.resolve("GPS OK", pos.coords.latitude, pos.coords.longitude);
+		}, function (error) {
+	        console.log(error);
+	        
+	        promesa.reject(error);
+	      });
+
+		return promesa;
+	}
+
+	gpsLocation().then(
+		function(msg, lat, lon) {
+			console.log("Mensaje del gps: " + msg + ". " + lat + " " + lon);
+			if(gpsStatus == "OK") {
+		    	console.log("Estado del GPS: " + gpsStatus);
+		    	$scope.recargarDatos(lat, lon);
+		    } else {
+		    	var alertPopup = $ionicPopup.alert({
+					title: 'GPS inactivo',
+					template: 'Es posible que el GPS esté desactivado o haya sido recientemente activado, por favor, actívelo y espere unos segundos. Gracias.'
+				});
+				$ionicLoading.hide();
+		    }
+		});
 }
 
 	compruebaGPS();
-  //$scope.recargarDatos();
 })
 
 .controller('controladorBarra', function ($scope, $ionicHistory) {
@@ -117,8 +146,11 @@ function compruebaGPS() {
 
 /**
    * @ngdoc controller
-   * @name controladorDetalles
-   * @requires $scope, $ionicModal, $compile, $ionicLoading
+   * @namespace controladorDetalles
+   * @requires $scope
+   * @requires $ionicModal
+   * @requires $compile
+   * @requires $ionicLoading
    */
 .controller('controladorDetalles', function($scope, $ionicModal, $compile, $ionicLoading, $cordovaBarcodeScanner, $ionicPopup, $ionicHistory, oferta) {
   $scope.oferta = oferta;
@@ -221,10 +253,13 @@ function compruebaGPS() {
 
 /**
    * @ngdoc controller
-   * @name controladorPublicar
-   * @requires $scope, $localstorage, $ionicHistory, $ionicLoading
+   * @namespace controladorPublicar
+   * @requires $scope
+   * @requires $localstorage
+   * @requires $ionicHistory
+   * @requires $
    */
-.controller('controladorPublicar', function($scope, $localstorage, $ionicHistory, $ionicLoading, datos, oferta) {
+.controller('controladorPublicar', function($scope, $localstorage, $ionicHistory, $timeout, datos, oferta) {
 	if (oferta != undefined) {
 		$scope.oferta = {};
 		$scope.oferta.id = oferta.id;
@@ -240,22 +275,118 @@ function compruebaGPS() {
 	}
 
 	$scope.publicar = function() {
-		if ($scope.oferta.id != undefined) {
-			datos.actualizarOferta($scope.oferta);
-			// Retroceder dos vistas
-			// get the right history stack based on the current view
-		    var historyId = $ionicHistory.currentHistoryId();
-		    var history = $ionicHistory.viewHistory().histories[historyId];
-		    // set the view 'depth' back in the stack as the back view
-		    var targetViewIndex = history.stack.length - 1 - 3;
-		    $ionicHistory.backView(history.stack[targetViewIndex]);
-		    // navigate to it
-		    $ionicHistory.goBack();
+		function valida() {
+			var toRet = 1;
+			if ($scope.oferta.descripcion_corta == undefined || $scope.oferta.descripcion_corta.length < 1){
+				document.getElementById("textoDescripcionCorta").classList.add('textoError');//className='input-label textoError';
+				document.getElementById("inputDescripcionCorta").classList.add('cajaError');
+				document.getElementById("errorDescripcionCorta").style.display = 'inherit';
+				$timeout(function() {
+					document.getElementById("textoDescripcionCorta").classList.remove('textoError');//className='input-label texto';
+					document.getElementById("inputDescripcionCorta").classList.remove('cajaError');
+				}, 2000);
 
-		} else {
-			datos.guardarOferta($scope.oferta, $localstorage.get("id", undefined));
-			$ionicHistory.goBack();
+				toRet = 0;
+			} else {
+				document.getElementById("errorDescripcionCorta").style.display = 'none';
+			}
+
+			if ($scope.oferta.descripcion == undefined || $scope.oferta.descripcion.length < 1) {
+				document.getElementById("textoDescripcionLarga").classList.add('textoError');//className='input-label textoError';
+				document.getElementById("inputDescripcionLarga").classList.add('cajaError');
+				document.getElementById("errorDescripcionLarga").style.display = 'inherit';
+				$timeout(function() {
+					document.getElementById("textoDescripcionLarga").classList.remove('textoError');//className='input-label texto';
+					document.getElementById("inputDescripcionLarga").classList.remove('cajaError');
+				}, 2000);
+
+				toRet = 0;
+			} else {
+				document.getElementById("errorDescripcionLarga").style.display = 'none';
+			}
+
+			if (($scope.oferta.duracion == undefined || $scope.oferta.duracion == null) && 
+				($scope.oferta.usos == undefined || $scope.oferta.usos < 1)) {
+				document.getElementById("textoDuracion").classList.add('textoError');//className='input-label textoError';
+				document.getElementById("inputDuracion").classList.add('cajaError');
+				
+				$scope.errorDuracion = "Debe introducir duracion o usos";
+				$scope.errorUsos = "Debe introducir duracion o usos";
+
+				document.getElementById("errorDuracion").style.display = 'inherit';
+				document.getElementById("errorUsos").style.display = 'inherit';
+
+				document.getElementById("textoUsos").classList.add('textoError');//className='input-label textoError';
+				document.getElementById("inputUsos").classList.add('cajaError');
+
+				$timeout(function() {
+					document.getElementById("textoDuracion").classList.remove('textoError');//className='input-label texto';
+					document.getElementById("inputDuracion").classList.remove('cajaError');
+
+					document.getElementById("textoUsos").classList.remove('textoError');//className='input-label texto';
+					document.getElementById("inputUsos").classList.remove('cajaError');
+				}, 2000);
+
+				toRet = 0; 
+			} else {
+				document.getElementById("errorDuracion").style.display = 'none';
+				document.getElementById("errorUsos").style.display = 'none';
+			}
+
+			if ($scope.oferta.usos != undefined) {
+				if (isNaN(parseInt($scope.oferta.usos))) {
+					document.getElementById("textoUsos").classList.add('textoError');//className='input-label textoError';
+					document.getElementById("inputUsos").classList.add('cajaError');
+					$scope.errorUsos = "Usos debe ser un número";
+					document.getElementById("errorUsos").style.display = 'inherit';
+
+					$timeout(function() {
+						document.getElementById("textoUsos").classList.remove('textoError');//className='input-label texto';
+						document.getElementById("inputUsos").classList.remove('cajaError');
+					}, 2000);
+
+					toRet = 0;
+				} else if ($scope.oferta.usos >= 10000) {
+					document.getElementById("textoUsos").classList.add('textoError');//className='input-label textoError';
+					document.getElementById("inputUsos").classList.add('cajaError');
+					$scope.errorUsos = "Usos no puede ser mayor que 9999";
+					document.getElementById("errorUsos").style.display = 'inherit';
+
+					$timeout(function() {
+						document.getElementById("textoUsos").classList.remove('textoError');//className='input-label texto';
+						document.getElementById("inputUsos").classList.remove('cajaError');
+					}, 2000);
+
+					toRet = 0;
+				} else {
+					document.getElementById("errorUsos").style.display = 'none';
+				}
+			}
+
+			return toRet;
 		}
+
+		if (valida() == 0) {
+			document.getElementById("errorGeneral").style.display = 'inherit';
+		} else {
+			if ($scope.oferta.id != undefined) {
+				datos.actualizarOferta($scope.oferta);
+				// Retroceder dos vistas
+				// get the right history stack based on the current view
+			    var historyId = $ionicHistory.currentHistoryId();
+			    var history = $ionicHistory.viewHistory().histories[historyId];
+			    // set the view 'depth' back in the stack as the back view
+			    var targetViewIndex = history.stack.length - 1 - 3;
+			    $ionicHistory.backView(history.stack[targetViewIndex]);
+			    // navigate to it
+			    $ionicHistory.goBack();
+
+			} else {
+				datos.guardarOferta($scope.oferta, $localstorage.get("id", undefined));
+				$ionicHistory.goBack();
+			}
+		}
+
 	}
 })
 

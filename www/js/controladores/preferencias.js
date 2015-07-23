@@ -110,12 +110,11 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
 	   	        		$scope.closeLogin();
 	   	        		
 	   	        		//Marcar la clave como usada
-	   	        		/*
 	   	        		usada = true;
 
 	   	        		object.set("usada", usada);
 	   	        		object.save(null, {});
-	   	        		*/
+	   	        		
 	   	        	} else {
 	   	        		toast.template = 'La clave ya ha sido usada';
 	   	        		$ionicLoading.show(toast);
