@@ -168,97 +168,77 @@ angular.module('servicio.datos', [])
       ofertas = [];
 
       query.include("usuario");
+      query.find().then(
+        function(results) {
+          var hay_ofertas = "no";
+          // Por cada elemento devuelto, se guarda en ofertas
+          for(var i=0; i < results.length; i++) {
+            var user = results[i].get("usuario");
 
-/*
-      var userLat; 
-      var userLon;
-      navigator.geolocation.getCurrentPosition(function (pos) { // Obtener la ubicación
-        userLat = pos.coords.latitude; 
-        userLon = pos.coords.longitude;
-        console.log(pos);
-*/
-        console.log("cargarDatos: Hace query");
+            var duracion = results[i].get("duracion") == undefined ? undefined : new Date(results[i].get("duracion"));
+            var usos = results[i].get("usos");
+            var distancia_oferta = distancia( userLat, userLon, user.get("latitud"),user.get("longitud") );
 
-        query.find().then(
-            function(results) {
-                var hay_ofertas = "no";
-                    // Por cada elemento devuelto, se guarda en ofertas
-                    for(var i=0; i < results.length; i++) {
-                      var user = results[i].get("usuario");
-                      
-                      var duracion = results[i].get("duracion") == undefined ? undefined : new Date(results[i].get("duracion"));
-                      var usos = results[i].get("usos");
-                      var distancia_oferta = distancia( userLat, userLon, user.get("latitud"),user.get("longitud") );
-
-                      if (distancia_oferta < 1000) {
-                          if (duracion == undefined && usos > 0) {
-                              hay_ofertas = "si";
-                              ofertas.push({
-                                nombre: user.get("local"),//results[i].get("local"),
-                                descripcion_corta: results[i].get("descripcion_corta"),
-                                descripcion: results[i].get("descripcion"),
-                                fin: obtenerFin(duracion, usos),
-                                duracion: duracion,
-                                usos: usos,
-                                distancia: distancia(
-                                  userLat, userLon, 
-                                  user.get("latitud"),user.get("longitud")
-                                  ),
-                                latitud: user.get("latitud"),
-                                longitud: user.get("longitud"),
-                                id: results[i].id
-                              });
-                          } else if (duracion != undefined) {
-                              if ((duracion.getHours() >= hoy.getHours()) && (Date.parse(duracion) > Date.parse(hoy))) {
-                                  hay_ofertas = "si";
-                                  ofertas.push({
-                                    nombre: user.get("local"),//results[i].get("local"),
-                                    descripcion_corta: results[i].get("descripcion_corta"),
-                                    descripcion: results[i].get("descripcion"),
-                                    fin: obtenerFin(duracion, usos),
-                                    duracion: duracion,
-                                    usos: usos,
-                                    distancia: distancia(
-                                      userLat, userLon, 
-                                      user.get("latitud"),user.get("longitud")
-                                      ),
-                                    latitud: user.get("latitud"),
-                                    longitud: user.get("longitud"),
-                                    id: results[i].id
-                                  });
-                              }
-                          }
-                      }
-
-                    }
-
-                    $localstorage.set("hay_ofertas", hay_ofertas);
-
-                    ofertas.sort(function(a, b){
-                      return (a.distancia - b.distancia);
+            if (distancia_oferta < 1000) {
+              if (duracion == undefined && usos > 0) {
+                hay_ofertas = "si";
+                ofertas.push({
+                    nombre: user.get("local"),//results[i].get("local"),
+                    descripcion_corta: results[i].get("descripcion_corta"),
+                    descripcion: results[i].get("descripcion"),
+                    fin: obtenerFin(duracion, usos),
+                    duracion: duracion,
+                    usos: usos,
+                    distancia: distancia(
+                      userLat, userLon, 
+                      user.get("latitud"),user.get("longitud")
+                      ),
+                    latitud: user.get("latitud"),
+                    longitud: user.get("longitud"),
+                    id: results[i].id
+                  });
+              } else if (duracion != undefined) {
+                if ((duracion.getHours() >= hoy.getHours()) && (Date.parse(duracion) > Date.parse(hoy))) {
+                  hay_ofertas = "si";
+                  ofertas.push({
+                      nombre: user.get("local"),//results[i].get("local"),
+                      descripcion_corta: results[i].get("descripcion_corta"),
+                      descripcion: results[i].get("descripcion"),
+                      fin: obtenerFin(duracion, usos),
+                      duracion: duracion,
+                      usos: usos,
+                      distancia: distancia(
+                        userLat, userLon, 
+                        user.get("latitud"),user.get("longitud")
+                        ),
+                      latitud: user.get("latitud"),
+                      longitud: user.get("longitud"),
+                      id: results[i].id
                     });
+                }
+              }
+            }
 
+            }
 
-                    $localstorage.setObject("ultimasOfertas", ofertas);
+            $localstorage.set("hay_ofertas", hay_ofertas);
 
-                    promesa.resolve("éxito");
+            ofertas.sort(function(a, b){
+              return (a.distancia - b.distancia);
+            });
+
+            $localstorage.setObject("ultimasOfertas", ofertas);
+
+            promesa.resolve("éxito");
                     
             },
             function(error){
-                console.log("Error: " + error.code + " " + error.message);
-                alert("No leo de la base de datos");
-                $ionicLoading.hide();
-                promesa.reject(error);
-            })
-/*
-      }, function (error) {
-        alert('No se ha podido obtener la localización');
-        console.log(error);
-        $localstorage.set("hay_ofertas", 'false');
-        $ionicLoading.hide();
-        promesa.reject(error);
-      });
-      */
+              console.log("Error: " + error.code + " " + error.message);
+              alert("No leo de la base de datos");
+              $ionicLoading.hide();
+              promesa.reject(error);
+            });
+
       return promesa;
     },
 
@@ -277,31 +257,31 @@ angular.module('servicio.datos', [])
       query.equalTo("email", usuario.email);
 
       query.find({
-          success: function(results) {
-            if (results.length > 0) {
-                // El usuario ya existe
-            console.log("Usuario existente");
-            alert("Usuario existente");
+        success: function(results) {
+          if (results.length > 0) {
+              // El usuario ya existe
+              console.log("Usuario existente");
+              alert("Usuario existente");
           } else {
             // Crea el usuario si no existe
 
-              console.log('Registrando usuario: ', usuario.nombre);
-              var user = new UserObject();
-              console.log(rfc3986EncodeURIComponent(usuario.local));
-              user.set("nombre", usuario.nombre);
-              user.set("password", usuario.password);
-              user.set("apellidos", usuario.apellidos);
-              user.set("email", usuario.email);
-              user.set("local", rfc3986EncodeURIComponent(usuario.local));
-              user.set("latitud", usuario.localizacion.latitud);
-              user.set("longitud", usuario.localizacion.longitud);
+            console.log('Registrando usuario: ', usuario.nombre);
+            var user = new UserObject();
+            console.log(rfc3986EncodeURIComponent(usuario.local));
+            user.set("nombre", usuario.nombre);
+            user.set("password", usuario.password);
+            user.set("apellidos", usuario.apellidos);
+            user.set("email", usuario.email);
+            user.set("local", rfc3986EncodeURIComponent(usuario.local));
+            user.set("latitud", usuario.localizacion.latitud);
+            user.set("longitud", usuario.localizacion.longitud);
 
-              user.save(null, {});
+            user.save(null, {});
 
-          $ionicLoading.show({ template: 'Usuario registrado', noBackdrop: true, duration: 2000 });
+            $ionicLoading.show({ template: 'Usuario registrado', noBackdrop: true, duration: 2000 });
 
-          $ionicHistory.goBack();
-          return true;
+            $ionicHistory.goBack();
+            return true;
           }
         },
           error: function(error) {

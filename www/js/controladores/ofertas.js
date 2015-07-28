@@ -24,7 +24,7 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 		if ($localstorage.get("hay_ofertas", "no") == "si") {
 			document.getElementById("mensajeOfertas").style.display='none';
 		} else {
-		  	document.getElementById("mensajeOfertas").style.display='inherit';
+			document.getElementById("mensajeOfertas").style.display='inherit';
 		}
 	}
 
@@ -35,12 +35,9 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
      */
 	var cargaPrevia = function() {
     	if (oferta != undefined) {
-		  	console.log("Cambiando a oferta");
 		  	$state.go('detalle', {oferta: JSON.stringify(oferta)});
 		  	oferta = undefined;
 		}
-
-		console.log("No hay oferta");
 		$scope.nombre = $localstorage.get("user", "");
 		
 		ofertasVacio();
@@ -65,9 +62,7 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 	$state.go('preferencias');
   }
 
-  $scope.recargarDatos = function(lat, lon) {
-  	console.log("Va a recargar los datos");
-  	
+  $scope.recargarDatos = function(lat, lon) {  	
   	datos.cargarDatos(lat, lon).then(
   		function(msg){
   			console.log("Recive promesa: " + msg);
@@ -111,8 +106,94 @@ function compruebaGPS() {
 		    promesa.resolve("GPS OK", pos.coords.latitude, pos.coords.longitude);
 		}, function (error) {
 	        console.log(error);
-	        
-	        promesa.reject(error);
+
+	        if (error.code == 3) {
+	        	// error por timeout - usar última posición conocida
+	        	var ultimaPos = $localstorage.getObject("ultimaPosicionConocida");
+	        	if (ultimaPos.longitud != undefined) {
+	        		gpsStatus = "OK";
+	        		$ionicPopup.alert({
+						title: 'GPS no disponible',
+						template: 'Se va a usar la última posición conocida. Asegúrese de que el GPS está activado para una mayor precisión.'
+					});
+	        		promesa.resolve("Usando localstorage ultima posicion", ultimaPos.latitud, ultimaPos.longitud);
+	        	} else {
+	        		// solo android 
+	        		window.ParsePushPlugin.getInstallationId(function(id) {
+	        			var UbicacionesFavoritas = Parse.Object.extend("UbicacionesFavoritas");
+      					var query = new Parse.Query(UbicacionesFavoritas);
+      					query.equalTo("nombre", "last");
+      					query.equalTo("installationId", id);
+      					query.find().then(
+      						function (results) {
+      							if (results.length > 0) {
+	      							ultimaPos = results[0].get("localizacion");
+	      							gpsStatus = "OK";
+	      							$ionicPopup.alert({
+										title: 'GPS no disponible',
+										template: 'Se va a usar la última posición conocida. Asegúrese de que el GPS está activado para una mayor precisión.'
+									});
+	      							promesa.resolve("Usando ultima posicion BBDD", ultimaPos.latitude, ultimaPos.longitude);
+	      						} else {
+	      							promesa.reject("No existe la ubicacion en la BBDD");
+	      							$ionicLoading.hide();
+	      						}
+      						},
+      						function (error) {
+								console.log("Error: " + error.code + " " + error.message);
+				                console.log("No leo ubicacion");
+				                promesa.reject(error);
+				                $ionicLoading.hide();
+      						});
+		            }, function(e) {
+		                console.log('compruebaGPS: Error en obtener id');
+		            });
+	        	}
+
+	        } else {
+	        	promesa.reject(error);
+	        	$ionicLoading.hide();
+	        }
+
+
+	        // HACER LLAMADA A getCurrentPosition para actualizar de fondo la ultima posición conocida
+	        console.log("Actualizando ubicacion - inicio");
+	        navigator.geolocation.getCurrentPosition(function(pos){
+	        	var ultimaPosicion = {latitud: pos.coords.latitude, longitud: pos.coords.longitude};
+	        	$localstorage.setObject("ultimaPosicionConocida", ultimaPosicion);
+
+	        	window.ParsePushPlugin.getInstallationId(function(id) {
+	        		console.log("Actualizando ubicacion - obteniendo id");
+	        		var UbicacionesFavoritas = Parse.Object.extend("UbicacionesFavoritas");
+	        		var query = new Parse.Query(UbicacionesFavoritas);
+	        		query.equalTo("nombre", "last");
+	        		query.equalTo("installationId", id);
+
+	        		query.find().then(
+	        			function (results) {
+	        				var point = new GeoPoint(pos.coords.latitude, pos.coords.longitude);
+	        				if(results.length > 0) {
+	      							// La ubicacion ya existe y la actualizamos
+	      							results[0].set("localizacion", point);
+	      							results[0].save(null, {});
+	      						} else {
+	      							var ultimaPosicionConocida = new UbicacionesFavoritas();
+	      							ultimaPosicionConocida.set("localizacion", point);
+	      							ultimaPosicionConocida.set("nombre", "last");
+	      							ultimaPosicionConocida.set("installationId", id);
+	      							ultimaPosicionConocida.save(null, {});
+	      						}
+	      					});
+	        	}, function(e) {
+	        		console.log('compruebaGPS: Error en obtener id');
+	        	});
+			});
+
+	      },
+	      {
+	      	enableHighAccuracy: false,
+			timeout: 5000,
+			maximumAge: 0
 	      });
 
 		return promesa;
@@ -120,9 +201,8 @@ function compruebaGPS() {
 
 	gpsLocation().then(
 		function(msg, lat, lon) {
-			console.log("Mensaje del gps: " + msg + ". " + lat + " " + lon);
+			console.log("Mensaje del gps: " + msg + ", " + lat + " " + lon + " Estado: " + gpsStatus);
 			if(gpsStatus == "OK") {
-		    	console.log("Estado del GPS: " + gpsStatus);
 		    	$scope.recargarDatos(lat, lon);
 		    } else {
 		    	var alertPopup = $ionicPopup.alert({
@@ -134,7 +214,7 @@ function compruebaGPS() {
 		});
 }
 
-	compruebaGPS();
+	$timeout(compruebaGPS, 1000);
 })
 
 .controller('controladorBarra', function ($scope, $ionicHistory) {
