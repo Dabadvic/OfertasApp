@@ -27,73 +27,61 @@ angular.module('controlador.Registro', ['servicio.datos','servicio.mapas'])
 			if ($scope.loginData.nombre == undefined || $scope.loginData.nombre.length < 1){
 				document.getElementById("inputNombre").classList.add('cajaError');
 				document.getElementById("errorNombre").style.display = 'inherit';
-				$timeout(function() {
-					document.getElementById("inputNombre").classList.remove('cajaError');
-				}, 2000);
 
 				toRet = 0;
 			} else {
 				document.getElementById("errorNombre").style.display = 'none';
+				document.getElementById("inputNombre").classList.remove('cajaError');
 			}
 
 			if ($scope.loginData.apellidos == undefined || $scope.loginData.apellidos.length < 1){
 				document.getElementById("inputApellidos").classList.add('cajaError');
 				document.getElementById("errorApellidos").style.display = 'inherit';
-				$timeout(function() {
-					document.getElementById("inputApellidos").classList.remove('cajaError');
-				}, 2000);
 
 				toRet = 0;
 			} else {
 				document.getElementById("errorApellidos").style.display = 'none';
+				document.getElementById("inputApellidos").classList.remove('cajaError');
 			}
 
 			if ($scope.loginData.password == undefined || $scope.loginData.password.length < 1){
 				document.getElementById("textPass").classList.add('cajaError');
 				document.getElementById("errorPass").style.display = 'inherit';
-				$timeout(function() {
-					document.getElementById("textPass").classList.remove('cajaError');
-				}, 2000);
 
 				toRet = 0;
 			} else {
 				document.getElementById("errorPass").style.display = 'none';
+				document.getElementById("textPass").classList.remove('cajaError');
 			}
 
 			if ($scope.loginData.password != $scope.loginData.repassword) {
 				document.getElementById("textoRePass").classList.add('cajaError');
 				document.getElementById("errorRePass").style.display = 'inherit';
-				$timeout(function() {
-					document.getElementById("textoRePass").classList.remove('cajaError');
-				}, 2000);
 
 				toRet = 0;
 			} else {
 				document.getElementById("errorRePass").style.display = 'none';
+				document.getElementById("textoRePass").classList.remove('cajaError');
 			}
 
 			if ($scope.loginData.email == undefined || $scope.loginData.email.length < 1){
 				document.getElementById("inputCorreo").classList.add('cajaError');
 				document.getElementById("errorCorreo").style.display = 'inherit';
-				$timeout(function() {
-					document.getElementById("inputCorreo").classList.remove('cajaError');
-				}, 2000);
 
 				toRet = 0;
 			} else {
 				document.getElementById("errorCorreo").style.display = 'none';
+				document.getElementById("inputCorreo").classList.remove('cajaError');
 			}
 
 			if ($scope.loginData.local == undefined || $scope.loginData.local.length < 1){
 				document.getElementById("inputLocal").classList.add('cajaError');
 				document.getElementById("errorLocal").style.display = 'inherit';
-				$timeout(function() {
-					document.getElementById("inputLocal").classList.remove('cajaError');
-				}, 2000);
 
 				toRet = 0;
 			} else {
 				document.getElementById("errorLocal").style.display = 'none';
+				document.getElementById("inputLocal").classList.remove('cajaError');
 			}
 
 			if ($scope.localizacion.latitud == undefined || $scope.localizacion.longitud == undefined) {

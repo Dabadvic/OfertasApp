@@ -32,19 +32,20 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
   $scope.notificaciones = function() {
     var notificaciones = $scope.recibirNotificaciones.checked;
     $localstorage.set("notificaciones", notificaciones);
-    if(notificaciones) {
-      window.ParsePushPlugin.subscribe('news', function(msg) {
-        console.log('Suscrito a news');
-      }, function(e) {
-        alert('error');
-      });
-    } else {
-      window.ParsePushPlugin.unsubscribe('news', function(msg) {
-        console.log('Cancelada subscripción a news');
-      }, function(e) {
-        alert('error');
-      });
-    }
+    if (window.ParsePushPlugin)
+      if(notificaciones) {
+        window.ParsePushPlugin.subscribe('news', function(msg) {
+          console.log('Suscrito a news');
+        }, function(e) {
+          alert('error');
+        });
+      } else {
+        window.ParsePushPlugin.unsubscribe('news', function(msg) {
+          console.log('Cancelada subscripción a news');
+        }, function(e) {
+          alert('error');
+        });
+      }
   };
 
   $scope.borrarDatos = function() {
@@ -73,9 +74,9 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
   $scope.login = function() {
   	if(!$localstorage.get("identificado", false)) {
     	$scope.modal.show();
-	    $scope.loginData.username = '';
-		$scope.loginData.password = '';
-		$scope.loginData.key = '';
+	    //$scope.loginData.username = '';
+  		$scope.loginData.password = '';
+  		$scope.loginData.key = '';
 	} else {
 		$localstorage.clear();
 		$scope.identifica();

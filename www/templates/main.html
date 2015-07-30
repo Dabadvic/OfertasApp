@@ -6,15 +6,21 @@
 
   <ion-nav-buttons side="right">
     <button class="button button-clear" ng-click="recarga()">
-      <img src="img/ic_cached.png" alt="Preferencias" width="34" height="34">
+      <img src="img/ic_cached_white.png" alt="Preferencias" width="34" height="34">
     </button>
     <button class="button button-clear" ng-click="preferencias()">
-      <img src="img/settings_black.png" alt="Preferencias" width="34" height="34">
+      <img src="img/settings_white.png" alt="Preferencias" width="34" height="34">
     </button>
   </ion-nav-buttons>
 
   <ion-pane>    
     <ion-content>
+
+    <ion-refresher
+      pulling-text="Pull to refresh..."
+      on-refresh="refresca()">
+    </ion-refresher>
+
       <ion-list>
         <ion-item ng-repeat="oferta in ofertas" ui-sref="detalle({oferta: '{{oferta}}' })">
         <div>

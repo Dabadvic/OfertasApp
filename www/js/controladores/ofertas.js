@@ -62,10 +62,19 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 	$state.go('preferencias');
   }
 
+  $scope.refresca = function () {
+  	compruebaGPS().then(
+  		function (msg) {
+  			//console.log(msg);
+  			// Stop the ion-refresher from spinning
+    		$scope.$broadcast('scroll.refreshComplete');
+  		});
+  }
+
   $scope.recargarDatos = function(lat, lon) {  	
   	datos.cargarDatos(lat, lon).then(
-  		function(msg){
-  			console.log("Recive promesa: " + msg);
+  		function (msg){
+  			console.log("Recibe promesa: " + msg);
   			ofertasVacio();
   			$scope.ofertas = datos.getOfertas();
   			$ionicLoading.hide();
@@ -93,14 +102,42 @@ function compruebaGPS() {
 		navigator.geolocation.getCurrentPosition(function(pos){
 			var ultimaPosicion = {latitud: pos.coords.latitude, longitud: pos.coords.longitude};
 			$localstorage.setObject("ultimaPosicionConocida", ultimaPosicion);
-		    gpsStatus = "OK";
+		    gpsStatus = "OK";  
 
 		    if (window.ParsePushPlugin) {
 		    	window.ParsePushPlugin.setLocation(ultimaPosicion.latitud, ultimaPosicion.longitud, function(msg){
-	                  console.log('Ubicación establecida');
-	              }, function(e) {
-	                  console.log('Error en setLocation: ' + e);
-	              });
+		    		console.log('setLocation: Ubicación establecida');
+		    	}, function(e) {
+		    		console.log('Error en setLocation: ' + e);
+		    	});
+
+		    	// Actualizar la posición en la base de datos
+		    	window.ParsePushPlugin.getInstallationId(function(id) {
+		    		var UbicacionesFavoritas = Parse.Object.extend("UbicacionesFavoritas");
+		    		var query = new Parse.Query(UbicacionesFavoritas);
+		    		query.equalTo("nombre", "last");
+		    		query.equalTo("installationId", id);
+
+		    		query.find().then(
+		    			function (results) {
+		    				var point = new Parse.GeoPoint(pos.coords.latitude, pos.coords.longitude);
+		    				if(results.length > 0) {
+	      							// La ubicacion ya existe y la actualizamos
+	      							console.log("Actualizando ubicacion en BBDD");
+	      							results[0].set("localizacion", point);
+	      							results[0].save(null, {});
+	      						} else {
+	      							console.log("Creando ubicacion en BBDD");
+	      							var ultimaPosicionConocida = new UbicacionesFavoritas();
+	      							ultimaPosicionConocida.set("localizacion", point);
+	      							ultimaPosicionConocida.set("nombre", "last");
+	      							ultimaPosicionConocida.set("installationId", id);
+	      							ultimaPosicionConocida.save(null, {});
+	      						}
+	      					});
+		    	}, function(e) {
+		    		console.log('compruebaGPS: Error en obtener id');
+		    	});
 		    }
 
 		    promesa.resolve("GPS OK", pos.coords.latitude, pos.coords.longitude);
@@ -119,75 +156,43 @@ function compruebaGPS() {
 	        		promesa.resolve("Usando localstorage ultima posicion", ultimaPos.latitud, ultimaPos.longitud);
 	        	} else {
 	        		// solo android 
-	        		window.ParsePushPlugin.getInstallationId(function(id) {
-	        			var UbicacionesFavoritas = Parse.Object.extend("UbicacionesFavoritas");
-      					var query = new Parse.Query(UbicacionesFavoritas);
-      					query.equalTo("nombre", "last");
-      					query.equalTo("installationId", id);
-      					query.find().then(
-      						function (results) {
-      							if (results.length > 0) {
-	      							ultimaPos = results[0].get("localizacion");
-	      							gpsStatus = "OK";
-	      							$ionicPopup.alert({
-										title: 'GPS no disponible',
-										template: 'Se va a usar la última posición conocida. Asegúrese de que el GPS está activado para una mayor precisión.'
-									});
-	      							promesa.resolve("Usando ultima posicion BBDD", ultimaPos.latitude, ultimaPos.longitude);
-	      						} else {
-	      							promesa.reject("No existe la ubicacion en la BBDD");
-	      							$ionicLoading.hide();
-	      						}
-      						},
-      						function (error) {
-								console.log("Error: " + error.code + " " + error.message);
-				                console.log("No leo ubicacion");
-				                promesa.reject(error);
-				                $ionicLoading.hide();
-      						});
-		            }, function(e) {
-		                console.log('compruebaGPS: Error en obtener id');
-		            });
+	        		if (window.ParsePushPlugin) {
+	        			window.ParsePushPlugin.getInstallationId(function(id) {
+	        				var UbicacionesFavoritas = Parse.Object.extend("UbicacionesFavoritas");
+	        				var query = new Parse.Query(UbicacionesFavoritas);
+	        				query.equalTo("nombre", "last");
+	        				query.equalTo("installationId", id);
+	        				query.find().then(
+	        					function (results) {
+	        						if (results.length > 0) {
+	        							ultimaPos = results[0].get("localizacion");
+	        							gpsStatus = "OK";
+	        							$ionicPopup.alert({
+	        								title: 'GPS no disponible',
+	        								template: 'Se va a usar la última posición conocida. Asegúrese de que el GPS está activado para una mayor precisión.'
+	        							});
+	        							promesa.resolve("Usando ultima posicion BBDD", ultimaPos.latitude, ultimaPos.longitude);
+	        						} else {
+	        							promesa.reject("No existe la ubicacion en la BBDD");
+	        							$ionicLoading.hide();
+	        						}
+	        					},
+	        					function (error) {
+	        						console.log("Error: " + error.code + " " + error.message);
+	        						console.log("No leo ubicacion");
+	        						promesa.reject(error);
+	        						$ionicLoading.hide();
+	        					});
+	        			}, function(e) {
+	        				console.log('compruebaGPS: Error en obtener id');
+	        			});
+					}
 	        	}
 
 	        } else {
 	        	promesa.reject(error);
 	        	$ionicLoading.hide();
 	        }
-
-
-	        // HACER LLAMADA A getCurrentPosition para actualizar de fondo la ultima posición conocida
-	        console.log("Actualizando ubicacion - inicio");
-	        navigator.geolocation.getCurrentPosition(function(pos){
-	        	var ultimaPosicion = {latitud: pos.coords.latitude, longitud: pos.coords.longitude};
-	        	$localstorage.setObject("ultimaPosicionConocida", ultimaPosicion);
-
-	        	window.ParsePushPlugin.getInstallationId(function(id) {
-	        		console.log("Actualizando ubicacion - obteniendo id");
-	        		var UbicacionesFavoritas = Parse.Object.extend("UbicacionesFavoritas");
-	        		var query = new Parse.Query(UbicacionesFavoritas);
-	        		query.equalTo("nombre", "last");
-	        		query.equalTo("installationId", id);
-
-	        		query.find().then(
-	        			function (results) {
-	        				var point = new GeoPoint(pos.coords.latitude, pos.coords.longitude);
-	        				if(results.length > 0) {
-	      							// La ubicacion ya existe y la actualizamos
-	      							results[0].set("localizacion", point);
-	      							results[0].save(null, {});
-	      						} else {
-	      							var ultimaPosicionConocida = new UbicacionesFavoritas();
-	      							ultimaPosicionConocida.set("localizacion", point);
-	      							ultimaPosicionConocida.set("nombre", "last");
-	      							ultimaPosicionConocida.set("installationId", id);
-	      							ultimaPosicionConocida.save(null, {});
-	      						}
-	      					});
-	        	}, function(e) {
-	        		console.log('compruebaGPS: Error en obtener id');
-	        	});
-			});
 
 	      },
 	      {
@@ -199,19 +204,23 @@ function compruebaGPS() {
 		return promesa;
 	}
 
+	var promesa = new Parse.Promise();
 	gpsLocation().then(
 		function(msg, lat, lon) {
 			console.log("Mensaje del gps: " + msg + ", " + lat + " " + lon + " Estado: " + gpsStatus);
 			if(gpsStatus == "OK") {
 		    	$scope.recargarDatos(lat, lon);
+		    	promesa.resolve("Todo bien");
 		    } else {
 		    	var alertPopup = $ionicPopup.alert({
 					title: 'GPS inactivo',
 					template: 'Es posible que el GPS esté desactivado o haya sido recientemente activado, por favor, actívelo y espere unos segundos. Gracias.'
 				});
+				promesa.reject("Algo fue mal");
 				$ionicLoading.hide();
 		    }
 		});
+	return promesa;
 }
 
 	$timeout(compruebaGPS, 1000);
@@ -302,10 +311,63 @@ function compruebaGPS() {
             }
         });
 
+	    // Crear un nuevo código QR
 		window.ParsePushPlugin.getInstallationId(function(id) {
+			console.log("InstallationId: " + id + " Id oferta: " + oferta.id);
+
+			var CodigoOferta = Parse.Object.extend("CodigoOferta");
+      		var query = new Parse.Query(CodigoOferta);
+			query.equalTo("installationId", id);
+			query.equalTo("id_oferta", oferta.id);
+
+			var promesa = new Parse.Promise();
+			query.find().then(
+				function (results) {
+					if (results.length > 0) {
+						console.log("Se ha encontrado un código registrado ya con los parametros");
+
+						id_codigo = results[0].id;
+						console.log("Devuelve código: " + id_codigo);
+						promesa.resolve(id_codigo);
+					} else {
+						console.log("Ningún código coincide con esos parámetros");
+
+						var nuevo_codigo = new CodigoOferta();
+			            nuevo_codigo.set("id_oferta", oferta.id);
+			            nuevo_codigo.set("installationId", id);
+			            nuevo_codigo.set("usado", false);
+			            nuevo_codigo.save().then(
+			            	function (obj) {
+			            		console.log("Devuelve código: " + obj.id);
+			            		promesa.resolve(obj.id);
+			            	});
+					}
+					return promesa;
+				},
+				function (error) {
+					console.log("Crear código: Error al acceder a la BBDD de Parse");
+					promesa.reject("error");
+					return promesa;
+				}).then(
+				function (codigo) {
+					console.log("Se ha obtenido codigo: " + codigo);
+					if (codigo != "error") {
+						console.log("Tenemos el código, creamos QR");
+						document.getElementById("divCodigoQR").style.display='inherit';
+					  	codigoqr = new QRCode(document.getElementById("qrcode"), {
+						    text: codigo,
+						    width: 200,
+						    height: 200,
+						    colorDark : "#000000",
+						    colorLight : "#ffffff",
+						    correctLevel : QRCode.CorrectLevel.H
+						});
+					}
+					$ionicLoading.hide();
+				});
+/*
             console.log("Obtenida id de la instalacion: " + id);
-            var CodigoObject = Parse.Object.extend("CodigoOferta");
-            var codigo = new CodigoObject();
+            var codigo = new CodigoOferta();
             codigo.set("id_oferta", oferta.id);
             codigo.set("installationId", id);
             codigo.save(null, {
@@ -323,9 +385,11 @@ function compruebaGPS() {
 					$ionicLoading.hide();
             	}
             });
+*/
         }, function(e) {
             alert('error');
         });
+
 	}
   }
 
@@ -363,12 +427,12 @@ function compruebaGPS() {
 				document.getElementById("errorDescripcionCorta").style.display = 'inherit';
 				$timeout(function() {
 					document.getElementById("textoDescripcionCorta").classList.remove('textoError');//className='input-label texto';
-					document.getElementById("inputDescripcionCorta").classList.remove('cajaError');
 				}, 2000);
 
 				toRet = 0;
 			} else {
 				document.getElementById("errorDescripcionCorta").style.display = 'none';
+				document.getElementById("inputDescripcionCorta").classList.remove('cajaError');
 			}
 
 			if ($scope.oferta.descripcion == undefined || $scope.oferta.descripcion.length < 1) {
@@ -377,16 +441,17 @@ function compruebaGPS() {
 				document.getElementById("errorDescripcionLarga").style.display = 'inherit';
 				$timeout(function() {
 					document.getElementById("textoDescripcionLarga").classList.remove('textoError');//className='input-label texto';
-					document.getElementById("inputDescripcionLarga").classList.remove('cajaError');
+					
 				}, 2000);
 
 				toRet = 0;
 			} else {
 				document.getElementById("errorDescripcionLarga").style.display = 'none';
+				document.getElementById("inputDescripcionLarga").classList.remove('cajaError');
 			}
 
 			if (($scope.oferta.duracion == undefined || $scope.oferta.duracion == null) && 
-				($scope.oferta.usos == undefined || $scope.oferta.usos < 1)) {
+				($scope.oferta.usos == undefined || $scope.oferta.usos < 1 || $scope.oferta.usos == "")) {
 				document.getElementById("textoDuracion").classList.add('textoError');//className='input-label textoError';
 				document.getElementById("inputDuracion").classList.add('cajaError');
 				
@@ -401,16 +466,15 @@ function compruebaGPS() {
 
 				$timeout(function() {
 					document.getElementById("textoDuracion").classList.remove('textoError');//className='input-label texto';
-					document.getElementById("inputDuracion").classList.remove('cajaError');
-
 					document.getElementById("textoUsos").classList.remove('textoError');//className='input-label texto';
-					document.getElementById("inputUsos").classList.remove('cajaError');
 				}, 2000);
 
 				toRet = 0; 
 			} else {
 				document.getElementById("errorDuracion").style.display = 'none';
 				document.getElementById("errorUsos").style.display = 'none';
+				document.getElementById("inputDuracion").classList.remove('cajaError');
+				document.getElementById("inputUsos").classList.remove('cajaError');
 			}
 
 			if ($scope.oferta.usos != undefined) {
@@ -422,7 +486,6 @@ function compruebaGPS() {
 
 					$timeout(function() {
 						document.getElementById("textoUsos").classList.remove('textoError');//className='input-label texto';
-						document.getElementById("inputUsos").classList.remove('cajaError');
 					}, 2000);
 
 					toRet = 0;
@@ -434,12 +497,12 @@ function compruebaGPS() {
 
 					$timeout(function() {
 						document.getElementById("textoUsos").classList.remove('textoError');//className='input-label texto';
-						document.getElementById("inputUsos").classList.remove('cajaError');
 					}, 2000);
 
 					toRet = 0;
 				} else {
 					document.getElementById("errorUsos").style.display = 'none';
+					document.getElementById("inputUsos").classList.remove('cajaError');
 				}
 			}
 

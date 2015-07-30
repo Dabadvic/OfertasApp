@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-eval' 'unsafe-inline'; img-src *">
     <title>Ofertas</title>
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
@@ -47,7 +48,7 @@
 
   </head>
   <body>
-    <ion-nav-bar align-title="left" class="bar-stable" ng-controller="controladorBarra">
+    <ion-nav-bar id="barraGeneral" align-title="left" class="bar-stable" ng-controller="controladorBarra">
 
       <ion-nav-back-button class="button-clear" style="font-size: 32px;" ng-click="atras()">
         <i class="ion-arrow-left-c"></i>

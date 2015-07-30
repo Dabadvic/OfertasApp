@@ -72,15 +72,17 @@ map {
 }
 
 .textoError {
-	color:red;
+	/*border-bottom: solid 2px #ff0000;*/
 }
 
-.caja {
+input.caja {
 	transition:box-shadow 2s;
+	border-bottom: solid 2px #E3F2FD;
 }
 
-.cajaError {
-	box-shadow: inset 0px 0px 0.5em red;
+input.cajaError {
+	/*box-shadow: inset 0px 0px 0.5em red;*/
+	border-bottom: solid 2px #F44336;
 }
 
 .item {
@@ -89,4 +91,22 @@ map {
 
 p.help-block {
 	color: red;
+	font-size: 11px;
+	padding-top: 4px;
+}
+
+input.caja:focus {
+	border-bottom: solid 2px #2196F3;
+}
+
+span.nav-bar-title.ng-binding , span.nav-bar-title , i.ion-arrow-left-c , span.back-text {
+	color: #BBDEFB;
+}
+
+ion-header-bar.bar-stable.bar.bar-header.disable-user-behavior {
+	    background-color: #0D47A1;
+}
+
+ion-content {
+	    background-color: #F5F5F5;
 }
