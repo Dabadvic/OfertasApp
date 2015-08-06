@@ -34,10 +34,12 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
      * @function cargaPrevia
      */
 	var cargaPrevia = function() {
+    	
     	if (oferta != undefined) {
 		  	$state.go('detalle', {oferta: JSON.stringify(oferta)});
 		  	oferta = undefined;
 		}
+
 		$scope.nombre = $localstorage.get("user", "");
 		
 		ofertasVacio();
@@ -53,6 +55,9 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
   $scope.$on('$ionicView.beforeEnter', cargaPrevia);
 
   $scope.ofertas = datos.getOfertas();
+
+  if (oferta == undefined)
+   $timeout(compruebaGPS, 1000);
 
   $scope.decode = function(str){
   	return decodeURIComponent(str);
@@ -223,7 +228,6 @@ function compruebaGPS() {
 	return promesa;
 }
 
-	$timeout(compruebaGPS, 1000);
 })
 
 .controller('controladorBarra', function ($scope, $ionicHistory) {

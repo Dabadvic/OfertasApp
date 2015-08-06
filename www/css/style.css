@@ -26,6 +26,16 @@
 	font-weight: normal;
 }
 
+#nombre {
+}
+#descripcion {
+	font-weight: normal;
+}
+
+.item p {
+	color: black;
+}
+
 map {
   display: block;
   width: 100%;
@@ -109,4 +119,32 @@ ion-header-bar.bar-stable.bar.bar-header.disable-user-behavior {
 
 ion-content {
 	    background-color: #F5F5F5;
+}
+
+
+ion-item.item.item-complex , 
+ion-item.item-icon-left.item 
+{
+	    /*margin: 4px;*/
+	    padding-right: 0px;
+	    /*box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);*/
+}
+
+/*
+ion-item#objetoLista.item.item-complex:active {
+      box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2);
+      transition-delay: 0s;
+}
+*/
+.textoDerecha {
+	position: relative;
+	text-align: right;
+}
+
+.textoIzquierda {
+	position: absolute;
+}
+
+p.descripcion {
+	white-space: normal;
 }

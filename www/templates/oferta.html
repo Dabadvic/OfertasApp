@@ -8,14 +8,15 @@
     <div class="list card">
     <div class="oferta">
         <div class="item" id="divNombreEs">
-          <h3>{{nombreEs}}</h3>
-        </div>
-        <div class="item">
-          <h2>{{oferta.descripcion_corta}}</h2>
-        </div>
-        <div class="item item-body">
-          <h2>{{oferta.fin}}</h2>
-          <h3>{{oferta.descripcion}}</h3>
+          <p>Local: {{nombreEs}}</p>
+        
+          <p>Título: {{oferta.descripcion_corta}}</p>
+        
+          <p>{{oferta.fin_usos}}</p> 
+
+          <p>{{oferta.fin_tiempo}}</p>
+        
+          <p class="descripcion">Descripcion: <br> {{oferta.descripcion}}</p>
         </div>
     </div>
       <div class="item tabs tabs-secondary tabs-icon-left">
@@ -49,6 +50,18 @@
     <div class="list card" id="divEstadisticasOferta">
       <h4>Datos sobre uso:</h4>
       <p>- Veces usada: {{oferta.veces_usada}}</p>
+    </div>
+
+    <div class="list card" id="divOtrasOfertas">
+      <div class="item">
+        <p>Otras ofertas del mismo local:</p>
+      </div>
+      <div class="item">
+        <p>Oferta 1</p>
+      </div>
+      <div class="item">
+        <p>Oferta 2</p>
+      </div>
     </div>
 
   </ion-content>

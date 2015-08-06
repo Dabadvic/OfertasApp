@@ -17,15 +17,15 @@
     <ion-content>
 
     <ion-refresher
-      pulling-text="Pull to refresh..."
+      pulling-text="Desliza hacia abajo para refrescar..."
       on-refresh="refresca()">
     </ion-refresher>
 
       <ion-list>
-        <ion-item ng-repeat="oferta in ofertas" ui-sref="detalle({oferta: '{{oferta}}' })">
+        <ion-item id="objetoLista" ng-repeat="oferta in ofertas" ui-sref="detalle({oferta: '{{oferta}}' })">
         <div>
-          <p> <h2 id="nombreOfertaMain">{{decode(oferta.nombre)}}</h2> <h3 id="distanciaOferta">{{oferta.distancia}} m</h3> <br>
-           <h3 id="descripcionOferta">{{oferta.descripcion_corta}}</h3>  <h3 id="finOferta">{{oferta.fin}}</h3></p>
+          <p id="nombre">{{decode(oferta.nombre)}} ({{oferta.distancia}} m)</p>
+          <p> <h2 id="descripcion">{{oferta.descripcion_corta}}</h2> </p>
         </div>
         </ion-item> 
       </ion-list>

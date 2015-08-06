@@ -123,10 +123,14 @@ angular.module('servicio.datos', [])
   function obtenerFin(duracion, usos) {
     var fin = "";
       if (usos != undefined) {
-        fin += "Usos: " + usos;
+        fin += "Cupones restantes: " + usos;
       }
-      if (duracion != undefined) {
-        fin += " Hasta " + duracion.getHours() + ":" + ((duracion.getMinutes().toString().length == 1) ? "0" + duracion.getMinutes() : duracion.getMinutes());
+
+      if (duracion != undefined && duracion != 0) {
+        fin += "Duración: Hasta " + duracion.getHours() + ":" + ((duracion.getMinutes().toString().length == 1) ? "0" + duracion.getMinutes() : duracion.getMinutes());
+        fin += " " + duracion.getDate() + "/" + (duracion.getMonth() + 1);
+      } else if (duracion == 0){
+        fin += "Duración: Hasta fin de existencias";
       }
 
       return fin;
@@ -171,6 +175,7 @@ angular.module('servicio.datos', [])
       query.find().then(
         function(results) {
           var hay_ofertas = "no";
+          var oferta_valida = false;
           // Por cada elemento devuelto, se guarda en ofertas
           for(var i=0; i < results.length; i++) {
             var user = results[i].get("usuario");
@@ -179,44 +184,38 @@ angular.module('servicio.datos', [])
             var usos = results[i].get("usos");
             var distancia_oferta = distancia( userLat, userLon, user.get("latitud"),user.get("longitud") );
 
+            oferta_valida = false;
+
             if (distancia_oferta < 1000) {
               if (duracion == undefined && usos > 0) {
-                hay_ofertas = "si";
-                ofertas.push({
-                    nombre: user.get("local"),//results[i].get("local"),
-                    descripcion_corta: results[i].get("descripcion_corta"),
-                    descripcion: results[i].get("descripcion"),
-                    fin: obtenerFin(duracion, usos),
-                    duracion: duracion,
-                    usos: usos,
-                    distancia: distancia(
-                      userLat, userLon, 
-                      user.get("latitud"),user.get("longitud")
-                      ),
-                    latitud: user.get("latitud"),
-                    longitud: user.get("longitud"),
-                    id: results[i].id
-                  });
+                oferta_valida = true;
               } else if (duracion != undefined) {
-                if ((duracion.getHours() >= hoy.getHours()) && (Date.parse(duracion) > Date.parse(hoy))) {
-                  hay_ofertas = "si";
-                  ofertas.push({
-                      nombre: user.get("local"),//results[i].get("local"),
-                      descripcion_corta: results[i].get("descripcion_corta"),
-                      descripcion: results[i].get("descripcion"),
-                      fin: obtenerFin(duracion, usos),
-                      duracion: duracion,
-                      usos: usos,
-                      distancia: distancia(
-                        userLat, userLon, 
-                        user.get("latitud"),user.get("longitud")
-                        ),
-                      latitud: user.get("latitud"),
-                      longitud: user.get("longitud"),
-                      id: results[i].id
-                    });
+                //if ((duracion.getHours() >= hoy.getHours()) && (Date.parse(duracion) > Date.parse(hoy))) {
+                if (Date.parse(duracion) > Date.parse(hoy)) {
+                  oferta_valida = true;
                 }
               }
+            }
+
+            if (oferta_valida) {
+              hay_ofertas = "si";
+              ofertas.push({
+                  nombre: user.get("local"),//results[i].get("local"),
+                  descripcion_corta: results[i].get("descripcion_corta"),
+                  descripcion: results[i].get("descripcion"),
+                  fin: obtenerFin(duracion, usos),
+                  fin_usos: obtenerFin(undefined, usos) ,
+                  fin_tiempo: obtenerFin((duracion == undefined ? 0 : duracion), undefined) ,
+                  duracion: duracion,
+                  usos: usos,
+                  distancia: distancia(
+                    userLat, userLon, 
+                    user.get("latitud"),user.get("longitud")
+                    ),
+                  latitud: user.get("latitud"),
+                  longitud: user.get("longitud"),
+                  id: results[i].id
+                });
             }
 
             }
@@ -341,6 +340,7 @@ angular.module('servicio.datos', [])
                     // Primera notificación
                     Parse.Push.send({
                       where: pushQuery,
+                      expiration_interval: 300,
                       data: {
                         alert: "Nueva oferta: " + oferta.descripcion_corta,
                         oferta: JSON.stringify(mensaje)
@@ -354,7 +354,7 @@ angular.module('servicio.datos', [])
                       }
                     });
 
-                    // Resto de notificaciones
+                    // Resto de notificaciones -----------------------------------------------------------------
                     $timeout(function(){
                       var segundaQuery = new Parse.Query(Parse.Installation);
                       segundaQuery.withinKilometers("location", punto, 1);
@@ -363,6 +363,7 @@ angular.module('servicio.datos', [])
 
                       Parse.Push.send({
                         where: segundaQuery,
+                        expiration_interval: 300,
                         data: {
                           alert: "Oferta: " + oferta.descripcion_corta,
                           oferta: JSON.stringify(mensaje)
