@@ -27,6 +27,7 @@
 }
 
 #nombre {
+	max-width: 65%;
 }
 #descripcion {
 	font-weight: normal;
@@ -125,9 +126,9 @@ ion-content {
 ion-item.item.item-complex , 
 ion-item.item-icon-left.item 
 {
-	    /*margin: 4px;*/
+	    /*margin: 4px;
+	    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);*/
 	    padding-right: 0px;
-	    /*box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);*/
 }
 
 /*
@@ -136,15 +137,50 @@ ion-item#objetoLista.item.item-complex:active {
       transition-delay: 0s;
 }
 */
-.textoDerecha {
+p.textoDerecha {
 	position: relative;
 	text-align: right;
+	color: #666;
 }
 
-.textoIzquierda {
+p.textoIzquierda {
 	position: absolute;
 }
 
-p.descripcion {
+p.largo {
 	white-space: normal;
+	font-family: 'Raleway', sans-serif;
+}
+
+p.destacado {
+	font-weight: bold;
+}
+
+#nombreLocal {
+	font-size: 100%;
+	font-style: italic;
+}
+
+#textoDistancia {
+	text-decoration: none;
+	color: #666;
+}
+
+.textoRojo {
+	color: red;
+}
+.textoVerde {
+	color: #0BDE14;
+}
+
+span.subrayado {
+	text-decoration: underline;
+}
+
+.visible {
+	display: 'inherit'; 
+}
+
+.invisible {
+	display: 'none';
 }

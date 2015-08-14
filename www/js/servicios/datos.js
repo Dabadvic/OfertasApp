@@ -122,15 +122,21 @@ angular.module('servicio.datos', [])
   /* Obtiene el texto que se mostrará al usuario como fin de la oferta */
   function obtenerFin(duracion, usos) {
     var fin = "";
-      if (usos != undefined) {
-        fin += "Cupones restantes: " + usos;
+      if (usos != undefined && usos != 0) {
+        fin += usos;
+      } else if (usos == 0) {
+        fin += "Hasta fin de duración";
       }
 
       if (duracion != undefined && duracion != 0) {
-        fin += "Duración: Hasta " + duracion.getHours() + ":" + ((duracion.getMinutes().toString().length == 1) ? "0" + duracion.getMinutes() : duracion.getMinutes());
-        fin += " " + duracion.getDate() + "/" + (duracion.getMonth() + 1);
+        var meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+          "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+        ];
+
+        fin += "Hasta " + duracion.getHours() + ":" + ((duracion.getMinutes().toString().length == 1) ? "0" + duracion.getMinutes() : duracion.getMinutes());
+        fin += "h del " + duracion.getDate() + " de " + meses[duracion.getMonth()];
       } else if (duracion == 0){
-        fin += "Duración: Hasta fin de existencias";
+        fin += "Hasta fin de existencias";
       }
 
       return fin;
@@ -204,7 +210,7 @@ angular.module('servicio.datos', [])
                   descripcion_corta: results[i].get("descripcion_corta"),
                   descripcion: results[i].get("descripcion"),
                   fin: obtenerFin(duracion, usos),
-                  fin_usos: obtenerFin(undefined, usos) ,
+                  fin_usos: obtenerFin(undefined, (usos == undefined ? 0 : usos)) ,
                   fin_tiempo: obtenerFin((duracion == undefined ? 0 : duracion), undefined) ,
                   duracion: duracion,
                   usos: usos,

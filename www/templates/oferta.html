@@ -1,4 +1,4 @@
-<ion-view view-title="Oferta">
+<ion-view cache-view="false" view-title="Oferta">
 
   <ion-nav-title>
     Oferta
@@ -8,15 +8,15 @@
     <div class="list card">
     <div class="oferta">
         <div class="item" id="divNombreEs">
-          <p>Local: {{nombreEs}}</p>
+          <p class="largo"> <span id="nombreLocal">{{nombreEs}}</span> <span id="textoDistancia">({{oferta.distancia}} m)</span> </p>
         
-          <p>Título: {{oferta.descripcion_corta}}</p>
+          <p class="largo">{{oferta.descripcion_corta}}</p>
         
-          <p>{{oferta.fin_usos}}</p> 
+          <p class="largo"><span class="subrayado">Cupones restantes:</span> <span id="textoFinUsos">{{oferta.fin_usos}}</span> </p> 
 
-          <p>{{oferta.fin_tiempo}}</p>
+          <p class="largo"><span class="subrayado">Duración:</span> {{oferta.fin_tiempo}}</p>
         
-          <p class="descripcion">Descripcion: <br> {{oferta.descripcion}}</p>
+          <p class="largo destacado">Descripción completa: <br> {{oferta.descripcion}}</p>
         </div>
     </div>
       <div class="item tabs tabs-secondary tabs-icon-left">
@@ -56,11 +56,8 @@
       <div class="item">
         <p>Otras ofertas del mismo local:</p>
       </div>
-      <div class="item">
-        <p>Oferta 1</p>
-      </div>
-      <div class="item">
-        <p>Oferta 2</p>
+      <div class="item" ng-repeat="oferta in ofertas" ng-click="cambiaOferta({{oferta}})">
+        <p> <h2 id="descripcion">{{oferta.descripcion_corta}}</h2> </p>
       </div>
     </div>
 

@@ -245,7 +245,7 @@ function compruebaGPS() {
    * @requires $compile
    * @requires $ionicLoading
    */
-.controller('controladorDetalles', function($scope, $ionicModal, $compile, $ionicLoading, $cordovaBarcodeScanner, $ionicPopup, $ionicHistory, oferta) {
+.controller('controladorDetalles', function($scope, $ionicModal, $compile, $ionicLoading, $cordovaBarcodeScanner, $ionicPopup, $ionicHistory, $timeout, oferta, datos) {
   $scope.oferta = oferta;
 
   $scope.nombreEs = decodeURIComponent(oferta.nombre);
@@ -253,11 +253,61 @@ function compruebaGPS() {
   $scope.$on('$ionicView.beforeEnter', function() {
     	$scope.textoCanjear = "Canjear";
     	$scope.textoComoLlegar = "Como Llegar";
+    	
     	document.getElementById("botonBorrarOferta").style.display='none';
     	document.getElementById("divCodigoQR").style.display='none';
     	document.getElementById("botonEstadisticasOferta").style.display='none';
     	document.getElementById("divEstadisticasOferta").style.display='none';
+
+
+    	// Pre-cargar las ofertas del mismo local
+    	var listadoOfertas = datos.getOfertas();
+    	$scope.ofertas = [];
+
+    	for (var i = 0; i < listadoOfertas.length; i++) {
+    		if (listadoOfertas[i].nombre == oferta.nombre && listadoOfertas[i].descripcion_corta != oferta.descripcion_corta) {
+    			$scope.ofertas.push(listadoOfertas[i]);
+    		}
+    	}
+
+    	if ($scope.ofertas.length == 0) {
+    		document.getElementById("divOtrasOfertas").style.display='none';
+    	}
+
+    	if (oferta.fin_usos < 10) {
+    		document.getElementById("textoFinUsos").classList.add('textoRojo');
+    	} else {
+    		document.getElementById("textoFinUsos").classList.add('textoVerde');
+    	}
+
   	});
+
+  $scope.cambiaOferta = function (oferta_nueva) {
+  	$ionicLoading.show({
+        template: 'Cambiando oferta'
+    });
+
+    $timeout(function(){
+    	// Cambia las otras ofertas
+	  	for (var i = 0; i < $scope.ofertas.length; i++) {
+	  		if ($scope.ofertas[i].descripcion_corta == oferta_nueva.descripcion_corta) {
+	  			$scope.ofertas[i] = $scope.oferta;
+	  		}
+	  	}
+
+	  	// Cambia la oferta base
+	  	$scope.oferta = oferta_nueva;
+
+	  	// Cambia el color
+	  	if (oferta_nueva.fin_usos < 10) {
+    		document.getElementById("textoFinUsos").classList.add('textoRojo');
+    	} else {
+    		document.getElementById("textoFinUsos").classList.add('textoVerde');
+    	}
+
+    	$ionicLoading.hide();
+    }, 1000);
+  }
 
   $scope.mapControl = {};
 
@@ -413,7 +463,7 @@ function compruebaGPS() {
 		$scope.oferta.id = oferta.id;
 		$scope.oferta.descripcion = oferta.descripcion;
 		$scope.oferta.descripcion_corta = oferta.descripcion_corta;
-		$scope.oferta.duracion = new Date(oferta.duracion);
+		$scope.oferta.duracion = oferta.duracion == undefined ? undefined : new Date(oferta.duracion);
 		$scope.oferta.usos = oferta.usos;
 
 		$scope.titulo = "Editar oferta";

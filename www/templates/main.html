@@ -1,7 +1,7 @@
 <ion-view view-title="Listado">
 
   <ion-nav-title>
-    Listado {{nombre}}
+    Ofertas cercanas
   </ion-nav-title>
 
   <ion-nav-buttons side="right">
@@ -24,7 +24,7 @@
       <ion-list>
         <ion-item id="objetoLista" ng-repeat="oferta in ofertas" ui-sref="detalle({oferta: '{{oferta}}' })">
         <div>
-          <p id="nombre">{{decode(oferta.nombre)}} ({{oferta.distancia}} m)</p>
+          <p id="nombre" class="textoIzquierda">{{decode(oferta.nombre)}}</p> <p class="textoDerecha">{{oferta.distancia}} m</p>
           <p> <h2 id="descripcion">{{oferta.descripcion_corta}}</h2> </p>
         </div>
         </ion-item> 

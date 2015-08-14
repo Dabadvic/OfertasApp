@@ -66,7 +66,8 @@ angular.module('controladores.ofertasPublicadas', ['servicio.datos', 'servicio.m
           	else
           		ofertas[i].fin = "Marcada por usos";
           	
-          	if(ofertas[i].duracion != undefined && Date.parse(ofertas[i].duracion) < Date.parse(hoy)) {
+          	if((ofertas[i].duracion != undefined && Date.parse(ofertas[i].duracion) < Date.parse(hoy)) 
+          		|| (ofertas[i].usos != undefined && ofertas[i].usos == 0)) {
           		ofertas[i].caducada = true;
           		$scope.caducadas.push(ofertas[i]);
           	} else {
@@ -235,9 +236,11 @@ angular.module('controladores.ofertasPublicadas', ['servicio.datos', 'servicio.m
 		document.getElementById("imagenCanjearOferta").className = "icon ion-camera";
 	    document.getElementById("imagenComoLlegarOferta").className = "icon ion-document-text";
 	    document.getElementById("divCodigoQR").style.display='none';
-	    document.getElementById("divNombreEs").style.display='none';
+	    document.getElementById("nombreLocal").style.display='none';
 	    document.getElementById("botonEstadisticasOferta").style.display='none';
 	    document.getElementById("divEstadisticasOferta").style.display='none';
+	    document.getElementById("divOtrasOfertas").style.display='none';
+	    document.getElementById("textoDistancia").style.display='none';
 	    $scope.textoCanjear = "Escanear";
 	    $scope.textoComoLlegar = "Editar";
 	    $scope.textoBorrar = "Borrar";
@@ -247,6 +250,25 @@ angular.module('controladores.ofertasPublicadas', ['servicio.datos', 'servicio.m
 			document.getElementById("botonCanjearOferta").style.display='none';
 	    	document.getElementById("botonComoLlegarOferta").style.display='none';
 	    	document.getElementById("botonEstadisticasOferta").style.display='inherit';
+		}
+
+		if (oferta.usos != undefined)
+			$scope.oferta.fin_usos = "" + oferta.usos;
+		else
+			$scope.oferta.fin_usos = "Sin cupones restantes";
+
+		var duracion = new Date(oferta.duracion);
+		if (oferta.duracion != undefined) {
+			var meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+	          "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+	        ];
+
+			$scope.oferta.fin_tiempo = "";
+	        $scope.oferta.fin_tiempo += "Hasta " + duracion.getHours() + ":" + ((duracion.getMinutes().toString().length == 1) ? "0" + duracion.getMinutes() : duracion.getMinutes());
+	        $scope.oferta.fin_tiempo += "h del " + duracion.getDate() + " de " + meses[duracion.getMonth()];
+        	//$scope.oferta.fin_tiempo = "Fecha fin: " + duracion.getHours() + ":" + ((duracion.getMinutes().toString().length == 1) ? "0" + duracion.getMinutes() : duracion.getMinutes()) + " " + duracion.getDate() + "/" + (duracion.getMonth() + 1);
+		} else {
+        	$scope.oferta.fin_tiempo = "Hasta fin de existencias";
 		}
   	})
 })
