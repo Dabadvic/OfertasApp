@@ -331,6 +331,10 @@ function compruebaGPS() {
   	}, function (error) {
        alert('Unable to get location: ' + error.message);
     });
+
+    $scope.$on('$ionicView.leave', function() {
+		$scope.modal.hide();
+	});
   }
 
   $scope.cierraMapa = function() {

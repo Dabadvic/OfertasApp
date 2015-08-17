@@ -6,11 +6,11 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controladores.o
 
   Parse.initialize("4R2V91bSep94FYqbspK1UkLIAL2Kd5IQJFCmZsMB", "aaHJB3mLTT2UmgaUyEvn2PQKBpO60WQDFqWNTodO");
 
+
   $ionicPlatform.registerBackButtonAction(function (event) {
     if($state.current.name=="ofertas"){
       navigator.app.exitApp();
-    }
-    else {
+    } else {
       $ionicHistory.goBack();
     }
   }, 100);
@@ -26,7 +26,7 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controladores.o
     }
 
     // Preparar Parse con la ID de la aplicación y la clave de JavaScript (ambas en la web)
-    // Parse.initialize("4R2V91bSep94FYqbspK1UkLIAL2Kd5IQJFCmZsMB", "aaHJB3mLTT2UmgaUyEvn2PQKBpO60WQDFqWNTodO");
+     Parse.initialize("4R2V91bSep94FYqbspK1UkLIAL2Kd5IQJFCmZsMB", "aaHJB3mLTT2UmgaUyEvn2PQKBpO60WQDFqWNTodO");
 
       if (window.ParsePushPlugin)
         window.ParsePushPlugin.register({}, 

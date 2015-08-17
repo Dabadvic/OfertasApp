@@ -3,7 +3,7 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
 .controller('controladorPreferencias', function($scope, $ionicModal, $timeout, $state, $ionicLoading, $localstorage) {
 
   $scope.identifica = function() {
-  	if($localstorage.get("identificado", false)) {
+  	if($localstorage.get("identificado", false) == 'true') {
 	    $scope.loginData.identificado = "Bienvenido, " + $localstorage.get("user", "") + ". Desconectarse";
 	    document.getElementById("botonEditar").style.display='inherit';
       document.getElementById("botonPublicar").style.display='inherit';
@@ -72,13 +72,17 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
 
   // Abre el login, reiniciando los campos por si han sido utilizados antes
   $scope.login = function() {
-  	if(!$localstorage.get("identificado", false)) {
+  	if($localstorage.get("identificado", false) == 'false') {
     	$scope.modal.show();
 	    //$scope.loginData.username = '';
   		$scope.loginData.password = '';
   		$scope.loginData.key = '';
+      $scope.$on('$ionicView.leave', function() {
+        $scope.modal.hide();
+      });
 	} else {
-		$localstorage.clear();
+		//$localstorage.clear();
+    $localstorage.set("identificado", false);
 		$scope.identifica();
 	}
 
