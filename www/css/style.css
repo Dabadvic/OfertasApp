@@ -177,10 +177,22 @@ span.subrayado {
 	text-decoration: underline;
 }
 
+p.centrado {
+	text-align: center;
+	padding-top: 5px;
+}
+
 .visible {
 	display: 'inherit'; 
 }
 
 .invisible {
 	display: 'none';
+}
+
+#qrcode {
+	margin: auto; 
+	width: 200px;
+	padding-top: 20px;
+	padding-bottom: 25px;
 }

@@ -343,7 +343,7 @@ function compruebaGPS() {
 
   var codigoqr = undefined;
   $scope.canjearOferta = function() {
-  	if (codigoqr == undefined) {
+  	if (codigoqr == undefined && window.ParsePushPlugin) {
   		$ionicLoading.show({
 	        template: 'preparando oferta'
 	    });
@@ -448,6 +448,18 @@ function compruebaGPS() {
             alert('error');
         });
 
+	} else if (codigoqr == undefined) {
+		/*
+		document.getElementById("divCodigoQR").style.display='inherit';
+					  	codigoqr = new QRCode(document.getElementById("qrcode"), {
+						    text: "holamundo",
+						    width: 200,
+						    height: 200,
+						    colorDark : "#000000",
+						    colorLight : "#ffffff",
+						    correctLevel : QRCode.CorrectLevel.H
+						});
+*/
 	}
   }
 
