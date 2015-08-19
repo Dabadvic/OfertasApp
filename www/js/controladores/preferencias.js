@@ -1,6 +1,6 @@
 angular.module('controlador.Preferencias', ['servicio.datos'])
 
-.controller('controladorPreferencias', function($scope, $ionicModal, $timeout, $state, $ionicLoading, $localstorage, datos) {
+.controller('controladorPreferencias', function($scope, $ionicModal, $timeout, $state, $ionicLoading, $localstorage, $translate, datos) {
 
   $scope.identifica = function() {
   	if($localstorage.get("identificado", false) == 'true') {
@@ -31,11 +31,18 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
     $scope.identifica();
 
     $scope.data = {};
-    $scope.data.valorDistanciaOfertas = $localstorage.get("distanciaOfertas", 1)
+    $scope.data.valorDistanciaOfertas = $localstorage.get("distanciaOfertas", 1);
+    $scope.data.idiomaApp = $localstorage.get("idiomaApp", 'es');
   })
 
   $scope.cambiaDistancia = function() {
     $localstorage.set("distanciaOfertas", $scope.data.valorDistanciaOfertas);
+  }
+
+  $scope.cambiaIdioma = function() {
+    $localstorage.set("idiomaApp", $scope.data.idiomaApp);
+
+    $translate.use($scope.data.idiomaApp);
   }
 
   $scope.notificaciones = function() {
@@ -66,7 +73,7 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
 
   // Crea los datos para el login modal
   $scope.loginData = {};
-  $scope.loginData.identificado = "¿Eres dueño de un negocio? Identifícate";
+  $scope.loginData.identificado = "Identifícate";
   
   // Crear la ventana modal que usaremos para el login
   $ionicModal.fromTemplateUrl('templates/login.html', {

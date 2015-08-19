@@ -18,7 +18,7 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
    * @requires $timeout
    * @requires $ionicPopup
    */
-.controller('controladorOfertas', function($scope, $state, $localstorage, $ionicLoading, $cordovaPush, $rootScope, $timeout, $ionicPopup, oferta, datos) {
+.controller('controladorOfertas', function($scope, $state, $localstorage, $ionicLoading, $cordovaPush, $rootScope, $timeout, $ionicPopup, $translate, oferta, datos) {
   
 	function ofertasVacio() {
 		if ($localstorage.get("hay_ofertas", "no") == "si") {
@@ -45,6 +45,8 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 		$scope.nombre = $localstorage.get("user", "");
 		
 		ofertasVacio();
+
+		$translate.use($localstorage.get("idiomaApp", 'es'));
 
 	/*
 		if ($localstorage.get("notificaciones", true) == "true")

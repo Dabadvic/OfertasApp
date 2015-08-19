@@ -115,7 +115,7 @@ var clientKey = "BWlU4AtdgyJsSLklJTYN4nk9cWpQNeuXZPxbALtp";
 })
 
 // Para la navegación entre vistas
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $translateProvider) {
   $urlRouterProvider.otherwise('ofertas')
 
 // Vista principal, que es la que se carga si no hay nada (especificado en el otherwise)
@@ -212,5 +212,11 @@ var clientKey = "BWlU4AtdgyJsSLklJTYN4nk9cWpQNeuXZPxbALtp";
       }
     }
   })
+
+  for(lang in translations){
+    $translateProvider.translations(lang, translations[lang]);
+  }
+ 
+  $translateProvider.preferredLanguage('es');
 
 });
