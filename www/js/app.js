@@ -1,5 +1,6 @@
 // Se indica el nombre del módulo y un array de los componentes que requiere
-angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controladores.ofertasPublicadas', 'controlador.Preferencias', 'controlador.Registro', 'controlador.editar', 'ngCordova'])
+angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controladores.ofertasPublicadas', 'pascalprecht.translate',
+                              'controlador.Preferencias', 'controlador.Registro', 'controlador.editar', 'ngCordova'])
 
 // Este lo trae así por defecto
 .run(function($ionicPlatform, $localstorage, $cordovaPush, $rootScope, $state, $ionicHistory) {

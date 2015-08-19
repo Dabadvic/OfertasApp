@@ -90,12 +90,15 @@ angular.module('controladores.ofertasPublicadas', ['servicio.datos', 'servicio.m
 	
 	Antes de entrar cambia los nombres en el html
  */
-.controller('controladorDetallesPublicada', function($scope, oferta, $state, datos, $ionicPopup, $ionicHistory, $cordovaBarcodeScanner) {
+.controller('controladorDetallesPublicada', function($scope, oferta, $state, datos, $ionicPopup, $ionicHistory, $cordovaBarcodeScanner, $ionicLoading) {
 	$scope.oferta = oferta;
 
 	// Escanear Oferta
 	$scope.canjearOferta = function() {
         $cordovaBarcodeScanner.scan().then(function(imageData) {
+        	$ionicLoading.show({
+			    template: 'analizando código'
+			});
             console.log(imageData.text);
             //console.log("Barcode Format -> " + imageData.format);
             //console.log("Cancelled -> " + imageData.cancelled);
@@ -105,7 +108,7 @@ angular.module('controladores.ofertasPublicadas', ['servicio.datos', 'servicio.m
 
             query.get(imageData.text, {
             	success: function(codigo) {
-            		if(codigo.get("id_oferta") == oferta.id) {
+            		if(codigo.get("id_oferta") == oferta.id && codigo.get("usado") == 'false') {
             			console.log("Escaneado con éxito");
             			
             			var pushQuery = new Parse.Query(Parse.Installation);
@@ -131,11 +134,8 @@ angular.module('controladores.ofertasPublicadas', ['servicio.datos', 'servicio.m
 						    template: 'El código escaneado es completamente válido'
 					   	});
 
-					   	codigo.destroy({
-					   		success: function(deleted) {
-					   			console.log("Código " + deleted.id + " borrado");
-					   		}
-					   	});
+					   	codigo.set("usado", true);
+					   	codigo.save(null, {});
 
 					   	// Guarda datos para estadísticas y fines de ofertas
 					   	var OfertaObject = Parse.Object.extend("OfertaObject");
@@ -182,10 +182,18 @@ angular.module('controladores.ofertasPublicadas', ['servicio.datos', 'servicio.m
 	                      }
 	                    });
 
-	                    $ionicPopup.alert({
-						    title: 'Código no válido',
-						    template: 'El código no pertenece a la oferta'
-					   	});
+	                    if (codigo.get("usado") == 'true') {
+	                    	$ionicPopup.alert({
+							    title: 'Código no válido',
+							    template: 'El código ya ha sido usado'
+						   	});
+	                    } else {
+	                    	$ionicPopup.alert({
+							    title: 'Código no válido',
+							    template: 'El código no pertenece a la oferta'
+						   	});
+	                    }
+	                    
             		}
             	},
             	error: function(error) {
@@ -195,6 +203,7 @@ angular.module('controladores.ofertasPublicadas', ['servicio.datos', 'servicio.m
 					   	});
             	}
             });
+        	$ionicLoading.hide();
         }, function(error) {
             console.log("An error happened -> " + error);
         });

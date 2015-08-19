@@ -1,6 +1,6 @@
 angular.module('controlador.Preferencias', ['servicio.datos'])
 
-.controller('controladorPreferencias', function($scope, $ionicModal, $timeout, $state, $ionicLoading, $localstorage) {
+.controller('controladorPreferencias', function($scope, $ionicModal, $timeout, $state, $ionicLoading, $localstorage, datos) {
 
   $scope.identifica = function() {
   	if($localstorage.get("identificado", false) == 'true') {
@@ -8,12 +8,14 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
 	    document.getElementById("botonEditar").style.display='inherit';
       document.getElementById("botonPublicar").style.display='inherit';
       document.getElementById("botonOfertasPublicadas").style.display='inherit';
+      document.getElementById("botonAmpliarCuenta").style.display='inherit';
       document.getElementById("imagenBotonEditar").className="icon ion-log-out";
     } else {
 	    $scope.loginData.identificado = "¿Eres dueño de un negocio? Identifícate";
 	    document.getElementById("botonEditar").style.display='none';
       document.getElementById("botonPublicar").style.display='none';
       document.getElementById("botonOfertasPublicadas").style.display='none';
+      document.getElementById("botonAmpliarCuenta").style.display='none';
       document.getElementById("imagenBotonEditar").className="icon ion-log-in";
     }
   }
@@ -27,7 +29,14 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
       $scope.recibirNotificaciones = {checked: true};
 
     $scope.identifica();
+
+    $scope.data = {};
+    $scope.data.valorDistanciaOfertas = $localstorage.get("distanciaOfertas", 1)
   })
+
+  $scope.cambiaDistancia = function() {
+    $localstorage.set("distanciaOfertas", $scope.data.valorDistanciaOfertas);
+  }
 
   $scope.notificaciones = function() {
     var notificaciones = $scope.recibirNotificaciones.checked;
@@ -50,6 +59,7 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
 
   $scope.borrarDatos = function() {
   	$localstorage.clear();
+    datos.clearOfertas();
   }
 
   //----------------------------------------------------Login-------------------------------------------------------------------------

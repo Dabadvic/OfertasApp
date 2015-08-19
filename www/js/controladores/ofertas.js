@@ -40,6 +40,8 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 		  	oferta = undefined;
 		}
 
+		$scope.ofertas = datos.getOfertas();
+
 		$scope.nombre = $localstorage.get("user", "");
 		
 		ofertasVacio();
@@ -342,6 +344,7 @@ function compruebaGPS() {
   }
 
   var codigoqr = undefined;
+  
   $scope.canjearOferta = function() {
   	if (codigoqr == undefined && window.ParsePushPlugin) {
   		$ionicLoading.show({
@@ -423,33 +426,14 @@ function compruebaGPS() {
 					}
 					$ionicLoading.hide();
 				});
-/*
-            console.log("Obtenida id de la instalacion: " + id);
-            var codigo = new CodigoOferta();
-            codigo.set("id_oferta", oferta.id);
-            codigo.set("installationId", id);
-            codigo.save(null, {
-            	success: function(code) {
-            		console.log("Código creado con éxito, empezando QR");
-            		document.getElementById("divCodigoQR").style.display='inherit';
-				  	codigoqr = new QRCode(document.getElementById("qrcode"), {
-					    text: code.id,
-					    width: 200,
-					    height: 200,
-					    colorDark : "#000000",
-					    colorLight : "#ffffff",
-					    correctLevel : QRCode.CorrectLevel.H
-					});
-					$ionicLoading.hide();
-            	}
-            });
-*/
+
         }, function(e) {
             alert('error');
         });
 
 	} else if (codigoqr == undefined) {
 		/*
+		// QR de prueba
 		document.getElementById("divCodigoQR").style.display='inherit';
 					  	codigoqr = new QRCode(document.getElementById("qrcode"), {
 						    text: "holamundo",

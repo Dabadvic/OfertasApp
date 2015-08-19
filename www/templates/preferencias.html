@@ -14,8 +14,12 @@
       <ion-checkbox ng-model="recibirNotificaciones.checked" ng-change="notificaciones()">Recibir notificaciones</ion-checkbox>
 
       <ion-item class="item item-input">
-        <div class="input-label">Distancia ofertas (metros)</div>
-        <input type="tel" value="1000"> 
+        <div class="input-label">Distancia ofertas</div>
+        <select id="distanciaOfertas" ng-model="data.valorDistanciaOfertas" ng-change="cambiaDistancia()">
+          <option value="1">1 km</option>
+          <option value="2">2 km</option>
+          <option value="5">5 km</option>
+        </select>
       </ion-item>
 
       <div class="item item-divider"> 
@@ -25,11 +29,11 @@
       <ion-item class="item-icon-left">
         <i class="icon ion-earth" style="font-size: 32px; color: #387EF5"></i>
         Idioma
-        <select>
+        <select id="idioma">
           <option value="es">Español</option>
           <option value="en">English</option>
-          <option value="it">Italiano</option>
           <option value="fr">Français</option>
+          <option value="it">Italiano</option>
           <option value="su">Suomi</option>
         </select>
       </ion-item>

@@ -155,6 +155,10 @@ angular.module('servicio.datos', [])
       return ofertas[index];
     },
 
+    clearOfertas: function() {
+      ofertas = {};
+    },
+
     /* Carga los datos de la base de datos en internet (Parse), para ello:
         1. Obtiene la ubicación actual del dispositivo (para el cálculo de distancias).
         2. Realiza la petición (query) al servidor indicando que añada el usuario al que pertenece la oferta.
@@ -175,6 +179,14 @@ angular.module('servicio.datos', [])
       var OfertaObject = Parse.Object.extend("OfertaObject");
       var query = new Parse.Query(OfertaObject);
 
+      var distanciaOferta;
+      switch($localstorage.get("distanciaOfertas", 1)) {
+        case 1: distanciaOferta = 1000; break;
+        case 2: distanciaOferta = 2000; break;
+        case 5: distanciaOferta = 5000; break;
+        default:  distanciaOferta = 1000;
+      }
+
       ofertas = [];
 
       query.include("usuario");
@@ -192,7 +204,7 @@ angular.module('servicio.datos', [])
 
             oferta_valida = false;
 
-            if (distancia_oferta < 1000) {
+            if (distancia_oferta < distanciaOferta) {
               if (duracion == undefined && usos > 0) {
                 oferta_valida = true;
               } else if (duracion != undefined) {
