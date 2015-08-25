@@ -5,8 +5,6 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controladores.o
 // Este lo trae así por defecto
 .run(function($ionicPlatform, $localstorage, $cordovaPush, $rootScope, $state, $ionicHistory) {
 
-  //Parse.initialize("4R2V91bSep94FYqbspK1UkLIAL2Kd5IQJFCmZsMB", "aaHJB3mLTT2UmgaUyEvn2PQKBpO60WQDFqWNTodO");
-
   $ionicPlatform.registerBackButtonAction(function (event) {
     if($state.current.name=="ofertas"){
       navigator.app.exitApp();
@@ -76,40 +74,6 @@ angular.module('ofertasApp', ['ionic', 'controladores.ofertas', 'controladores.o
 
     }, 350);
 
-//-------------------------------------------------------------------------------
-/*
-var applicationId = "4R2V91bSep94FYqbspK1UkLIAL2Kd5IQJFCmZsMB";
-var clientKey = "BWlU4AtdgyJsSLklJTYN4nk9cWpQNeuXZPxbALtp";
-//call registerAsPushNotificationClient internally
-  window.parse.setUp(applicationId, clientKey);
-  
-  //registerAsPushNotificationClient callback
-  window.parse.onRegisterAsPushNotificationClientSucceeded = function() {
-    //alert('Registrado como cliente en notificaciones');
-    console.log('Registrado como cliente en notificaciones');
-  };
-  window.parse.onRegisterAsPushNotificationClientFailed = function() {
-    alert('Registro fallido');
-  };
-  
-  //subscribe callback
-  window.parse.onSubscribeToChannelSucceeded = function() {
-    //alert('Suscrito a canal');
-    console.log('Suscrito a canal');
-  };
-  window.parse.onSubscribeToChannelFailed = function() {
-    alert('Suscrito fallido');
-  };  
-  //unsubscribe callback
-  window.parse.onUnsubscribeSucceeded = function() {
-    //alert('Cancelada suscripción a canal');
-    console.log('Cancelada suscripción a canal');
-  };
-  window.parse.onUnsubscribeFailed = function() {
-    alert('Cancelada fallida');
-  };  
-  */
-//-------------------------------------------------------------------------------
 
   });
 })

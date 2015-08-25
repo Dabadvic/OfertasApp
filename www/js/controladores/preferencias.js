@@ -4,19 +4,21 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
 
   $scope.identifica = function() {
   	if($localstorage.get("identificado", false) == 'true') {
-	    $scope.loginData.identificado = "Bienvenido, " + $localstorage.get("user", "") + ". Desconectarse";
+	    $scope.usuario = $localstorage.get("user", "");
 	    document.getElementById("botonEditar").style.display='inherit';
       document.getElementById("botonPublicar").style.display='inherit';
       document.getElementById("botonOfertasPublicadas").style.display='inherit';
       document.getElementById("botonAmpliarCuenta").style.display='inherit';
-      document.getElementById("imagenBotonEditar").className="icon ion-log-out";
+      document.getElementById("botonIdentificar").style.display='none';
+      document.getElementById("botonLogOut").style.display='inherit';
     } else {
 	    $scope.loginData.identificado = "¿Eres dueño de un negocio? Identifícate";
 	    document.getElementById("botonEditar").style.display='none';
       document.getElementById("botonPublicar").style.display='none';
       document.getElementById("botonOfertasPublicadas").style.display='none';
       document.getElementById("botonAmpliarCuenta").style.display='none';
-      document.getElementById("imagenBotonEditar").className="icon ion-log-in";
+      document.getElementById("botonIdentificar").style.display='inherit';
+      document.getElementById("botonLogOut").style.display='none';
     }
   }
 
@@ -89,20 +91,17 @@ angular.module('controlador.Preferencias', ['servicio.datos'])
 
   // Abre el login, reiniciando los campos por si han sido utilizados antes
   $scope.login = function() {
-  	if($localstorage.get("identificado", false) == 'false') {
-    	$scope.modal.show();
-	    //$scope.loginData.username = '';
-  		$scope.loginData.password = '';
-  		$scope.loginData.key = '';
-      $scope.$on('$ionicView.leave', function() {
-        $scope.modal.hide();
-      });
-	} else {
-		//$localstorage.clear();
-    $localstorage.set("identificado", false);
-		$scope.identifica();
-	}
+    $scope.modal.show();
+    $scope.loginData.password = '';
+    $scope.loginData.key = '';
+    $scope.$on('$ionicView.leave', function() {
+      $scope.modal.hide();
+    });
+  };
 
+  $scope.logout = function() {
+    $localstorage.set("identificado", false);
+    $scope.identifica();
   };
 
   // Función que asigna al botón registrar la función de ir a la vista de registro ---------------------------------------Registro

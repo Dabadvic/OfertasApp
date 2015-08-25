@@ -18,7 +18,8 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
    * @requires $timeout
    * @requires $ionicPopup
    */
-.controller('controladorOfertas', function($scope, $state, $localstorage, $ionicLoading, $cordovaPush, $rootScope, $timeout, $ionicPopup, $translate, oferta, datos) {
+.controller('controladorOfertas', function($scope, $state, $localstorage, $ionicLoading, $cordovaPush, $translate, 
+											$rootScope, $timeout, $ionicPopup, $translate, oferta, datos) {
   
 	function ofertasVacio() {
 		if ($localstorage.get("hay_ofertas", "no") == "si") {
@@ -47,13 +48,6 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 		ofertasVacio();
 
 		$translate.use($localstorage.get("idiomaApp", 'es'));
-
-	/*
-		if ($localstorage.get("notificaciones", true) == "true")
-			window.parse.subscribeToChannel('news');
-		else
-			window.parse.unsubscribe('news');
-	*/
   	};
 
   $scope.$on('$ionicView.beforeEnter', cargaPrevia);
@@ -74,7 +68,6 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
   $scope.refresca = function () {
   	compruebaGPS().then(
   		function (msg) {
-  			//console.log(msg);
   			// Stop the ion-refresher from spinning
     		$scope.$broadcast('scroll.refreshComplete');
   		});
@@ -101,6 +94,12 @@ angular.module('controladores.ofertas', ['servicio.datos', 'servicio.mapas', 'io
 */
 function compruebaGPS() {
  // Avisar al usuario de que tiene el GPS desactivado
+ 	$translate(['Cargando']).then(function (translations) {
+	    $ionicLoading.show({
+		    template: translations.Cargando
+		});
+	  });
+
  	$ionicLoading.show({
 	    template: 'loading'
 	});
@@ -158,10 +157,14 @@ function compruebaGPS() {
 	        	var ultimaPos = $localstorage.getObject("ultimaPosicionConocida");
 	        	if (ultimaPos.longitud != undefined) {
 	        		gpsStatus = "OK";
-	        		$ionicPopup.alert({
-						title: 'GPS no disponible',
-						template: 'Se va a usar la última posición conocida. Asegúrese de que el GPS está activado para una mayor precisión.'
+
+	        		$translate(['NoGPS', 'UltimaPosicion']).then(function (translations) {
+						$ionicPopup.alert({
+							title: translations.NoGPS,
+							template: translations.UltimaPosicion
+						});
 					});
+
 	        		promesa.resolve("Usando localstorage ultima posicion", ultimaPos.latitud, ultimaPos.longitud);
 	        	} else {
 	        		// solo android 
@@ -176,10 +179,14 @@ function compruebaGPS() {
 	        						if (results.length > 0) {
 	        							ultimaPos = results[0].get("localizacion");
 	        							gpsStatus = "OK";
-	        							$ionicPopup.alert({
-	        								title: 'GPS no disponible',
-	        								template: 'Se va a usar la última posición conocida. Asegúrese de que el GPS está activado para una mayor precisión.'
-	        							});
+
+	        							$translate(['NoGPS', 'UltimaPosicion']).then(function (translations) {
+											$ionicPopup.alert({
+												title: translations.NoGPS,
+												template: translations.UltimaPosicion
+											});
+										});
+
 	        							promesa.resolve("Usando ultima posicion BBDD", ultimaPos.latitude, ultimaPos.longitude);
 	        						} else {
 	        							promesa.reject("No existe la ubicacion en la BBDD");
@@ -221,10 +228,14 @@ function compruebaGPS() {
 		    	$scope.recargarDatos(lat, lon);
 		    	promesa.resolve("Todo bien");
 		    } else {
-		    	var alertPopup = $ionicPopup.alert({
-					title: 'GPS inactivo',
-					template: 'Es posible que el GPS esté desactivado o haya sido recientemente activado, por favor, actívelo y espere unos segundos. Gracias.'
+
+		    	$translate(['GPSInactivo', 'ReactivaGPS']).then(function (translations) {
+					$ionicPopup.alert({
+						title: translations.GPSInactivo,
+						template: translations.ReactivaGPS
+					});
 				});
+
 				promesa.reject("Algo fue mal");
 				$ionicLoading.hide();
 		    }
@@ -249,7 +260,8 @@ function compruebaGPS() {
    * @requires $compile
    * @requires $ionicLoading
    */
-.controller('controladorDetalles', function($scope, $ionicModal, $compile, $ionicLoading, $cordovaBarcodeScanner, $ionicPopup, $ionicHistory, $timeout, oferta, datos) {
+.controller('controladorDetalles', function($scope, $ionicModal, $compile, $ionicLoading, $cordovaBarcodeScanner, $ionicPopup, 
+											$ionicHistory, $timeout, $translate, oferta, datos) {
   $scope.oferta = oferta;
 
   $scope.nombreEs = decodeURIComponent(oferta.nombre);
@@ -287,9 +299,11 @@ function compruebaGPS() {
   	});
 
   $scope.cambiaOferta = function (oferta_nueva) {
-  	$ionicLoading.show({
-        template: 'Cambiando oferta'
-    });
+  	$translate(['Cambiando']).then(function (translations) {
+	    $ionicLoading.show({
+		    template: translations.Cambiando
+		});
+	  });
 
     $timeout(function(){
     	// Cambia las otras ofertas
@@ -445,7 +459,7 @@ function compruebaGPS() {
 						    colorLight : "#ffffff",
 						    correctLevel : QRCode.CorrectLevel.H
 						});
-*/
+		*/
 	}
   }
 

@@ -111,7 +111,7 @@ input.caja:focus {
 }
 
 span.nav-bar-title.ng-binding , span.nav-bar-title , i.ion-arrow-left-c , span.back-text {
-	color: #BBDEFB;
+	color: white;
 }
 
 ion-header-bar.bar-stable.bar.bar-header.disable-user-behavior {

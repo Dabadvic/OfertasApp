@@ -1,35 +1,35 @@
 <ion-modal-view>
   <ion-header-bar>
-    <h1 class="title">Negocio</h1>
+    <h1 class="title">{{ 'Negocio' | translate }}</h1>
     <div class="buttons">
-      <button class="button button-clear" ng-click="closeLogin()">Cerrar</button>
+      <button class="button button-clear" ng-click="closeLogin()">{{ 'Cerrar' | translate }}</button>
     </div>
   </ion-header-bar>
   <ion-content>
       <div class="list">
         <label class="item item-input">
-          <input type="text" placeholder="Correo" ng-model="loginData.username">
+          <input type="text" placeholder="{{ 'Correo' | translate }}" ng-model="loginData.username">
         </label>
         <label class="item item-input">
-          <input type="password" placeholder="Contraseña" ng-model="loginData.password">
+          <input type="password" placeholder="{{ 'Contraseña' | translate }}" ng-model="loginData.password">
         </label>
         <label class="item">
-          <button class="button button-block button-positive" ng-click="identificar()">Identifícame</button>
+          <button class="button button-block button-positive" ng-click="identificar()">{{ 'Identifica' | translate }}</button>
         </label>
 
         <div class="item item-divider"> 
-          Registrar negocio
+          {{ 'Registrar' | translate }}
         </div>
         
         <label class="item item-input">
-          <span class="input-label">Clave de registro</span>
+          <span class="input-label">{{ 'Clave' | translate }}</span>
           <input type="text" ng-model="loginData.key">
         </label>
         <label class="item">
-          <button class="button button-block button-balanced" ng-click="registraUsuario()">Registrate</button>
+          <button class="button button-block button-balanced" ng-click="registraUsuario()">{{ 'Registrate' | translate }}</button>
         </label>
         <label class="item">
-          <p>Puedes conseguir tu clave mandando un email a:</p><p>contacto@email.com</p>
+          <p>{{ 'Conseguir' | translate }}:</p><p>contacto@email.com</p>
         </label>
       </div>
   </ion-content>

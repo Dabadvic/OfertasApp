@@ -12,11 +12,11 @@
         
           <p class="largo">{{oferta.descripcion_corta}}</p>
         
-          <p class="largo"><span class="subrayado">Cupones restantes:</span> <span id="textoFinUsos">{{oferta.fin_usos}}</span> </p> 
+          <p class="largo"><span class="subrayado">{{ 'Cupones' | translate }}:</span> <span id="textoFinUsos">{{oferta.fin_usos}}</span> </p> 
 
-          <p class="largo"><span class="subrayado">Duración:</span> {{oferta.fin_tiempo}}</p>
+          <p class="largo"><span class="subrayado">{{ 'Duracion' | translate }}:</span> {{oferta.fin_tiempo}}</p>
         
-          <p class="largo destacado">Descripción completa: <br> {{oferta.descripcion}}</p>
+          <p class="largo destacado">{{ 'DescripcionCompleta' | translate }}: <br> {{oferta.descripcion}}</p>
         </div>
     </div>
       <div class="item tabs tabs-secondary tabs-icon-left">
@@ -44,7 +44,7 @@
 
     <div class="list card" id="divCodigoQR">
       <p class="centrado">
-      ¡<span class="subrayado">Enseña</span> el código QR en el establecimiento y aplica la oferta!
+      {{ 'CodigoQR' | translate }}
       </p>
       <div id="qrcode"></div>
     </div>
@@ -56,7 +56,7 @@
 
     <div class="list card" id="divOtrasOfertas">
       <div class="item">
-        <p>Otras ofertas del mismo local:</p>
+        <p>{{ 'Otras' | translate }}:</p>
       </div>
       <div class="item" ng-repeat="oferta in ofertas" ng-click="cambiaOferta({{oferta}})">
         <p> <h2 id="descripcion">{{oferta.descripcion_corta}}</h2> </p>

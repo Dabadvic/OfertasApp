@@ -32,15 +32,19 @@
         <select id="idioma" ng-model="data.idiomaApp" ng-change="cambiaIdioma()">
           <option value="es">Español</option>
           <option value="en">English</option>
-          <option value="fr">Français</option>
           <option value="it">Italiano</option>
           <option value="su">Suomi</option>
         </select>
       </ion-item>
 
       <ion-item id="botonIdentificar" class="item-icon-left" ng-click="login()">
-        {{loginData.identificado}}
-        <i id="imagenBotonEditar" class="icon ion-log-out" style="font-size: 32px; color: #387EF5"></i>
+        {{ 'Identificate' | translate }}
+        <i class="icon ion-log-in" style="font-size: 32px; color: #387EF5"></i>
+      </ion-item>
+
+      <ion-item id="botonLogOut" class="item-icon-left" ng-click="logout()">
+        {{ 'Bienvenido' | translate }}, {{usuario}}. {{ 'Desconectarse' | translate }}
+        <i class="icon ion-log-out" style="font-size: 32px; color: #387EF5"></i>
       </ion-item>
 
       <ion-item id="botonEditar" class="item-icon-left" ui-sref="editarPerfil">
